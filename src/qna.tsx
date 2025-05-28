@@ -1,0 +1,77 @@
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+
+const QnA: React.FC = () => {
+  const [questions, setQuestions] = useState([
+    {
+      id: 1,
+      title: '기숙사 입사 날짜 문의',
+      category: '입사',
+      content: '2024년 1학기 기숙사 입사 날짜가 언제인가요?',
+      date: '2024-03-15',
+      answer: ''
+    },
+    {
+      id: 2,
+      title: '세탁기 사용 방법',
+      category: '시설',
+      content: '세탁기 사용 방법을 알려주세요.',
+      date: '2024-03-14',
+      answer: '1층 세탁실에 있는 세탁기는 카드로 결제 후 사용 가능합니다. 세제는 개인 준비물입니다.'
+    },
+    {
+      id: 3,
+      title: '방학 중 기숙사 사용',
+      category: '기타',
+      content: '방학 중에도 기숙사에 머물 수 있나요?',
+      date: '2024-03-13',
+      answer: '방학 중 기숙사 사용은 별도 신청이 필요합니다. 학과 사무실에서 신청서를 받아 작성해주세요.'
+    }
+  ]);
+
+  return (
+    <div className="p-8">
+      <div className="flex justify-between items-center mb-8">
+        <div className="flex items-center">
+          <button
+            onClick={() => window.history.back()}
+            className="mr-4 p-2 hover:bg-gray-100 rounded-full"
+          >
+            <i className="fas fa-arrow-left text-gray-600"></i>
+          </button>
+          <h1 className="text-2xl font-bold">Q&A 관리</h1>
+        </div>
+      </div>
+      <div className="bg-white rounded-lg shadow-sm border border-gray-100">
+        <div className="p-6 border-b border-gray-100">
+          <h2 className="text-lg font-bold">문의사항 목록</h2>
+        </div>
+        <div className="divide-y divide-gray-100">
+          {questions.map((question) => (
+            <Link to={`/qna/${question.id}`} key={question.id} className="block hover:bg-gray-50 transition">
+              <div className="p-6 cursor-pointer">
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <span className="inline-block px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 mr-2">
+                      {question.category}
+                    </span>
+                    <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${
+                      question.answer ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {question.answer ? '답변 완료' : '답변 미작성'}
+                    </span>
+                  </div>
+                  <span className="text-sm text-gray-500">{question.date}</span>
+                </div>
+                <h3 className="text-lg font-medium mb-2">{question.title}</h3>
+                <p className="text-gray-600 mb-4 line-clamp-2">{question.content}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default QnA; 
