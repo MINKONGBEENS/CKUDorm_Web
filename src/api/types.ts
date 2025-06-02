@@ -1,3 +1,5 @@
+import { StudentStatus, StudentGrade, PointType } from '../constants/student';
+
 export interface ApiResponse<T> {
   data: T;
   status: number;
@@ -5,10 +7,32 @@ export interface ApiResponse<T> {
 }
 
 export interface Student {
-  id: string;
+  id: number;
   name: string;
-  roomNumber: string;
-  // 추가 필요한 학생 정보 필드
+  studentId: string;
+  room: string;
+  status: StudentStatus;
+  phone: string;
+  email: string;
+  grade: StudentGrade;
+  department: string;
+  college: string;
+  contact: string;
+  checkInDate: string;
+  checkOutDate: string;
+  points: Point[];
+  totalMeritPoints: number;
+  totalDemeritPoints: number;
+}
+
+export interface Point {
+  id: number;
+  type: PointType;
+  reason: string;
+  points: number;
+  date: string;
+  description: string;
+  issuedBy: string;
 }
 
 export interface QnA {

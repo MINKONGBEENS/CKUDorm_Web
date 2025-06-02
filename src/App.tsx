@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
-import Dashboard from './dashboard';
-import RoomChange from './room_change';
-import StudentManagement from './student_management';
-import MealMenu from './meal_menu';
-import QnA from './qna';
-import QnADetail from './qna_detail';
-import RepairReport from './repair_report';
+import Dashboard from './pages/dashboard';
+import RoomChange from './pages/room/index';
+import StudentManagement from './pages/student/index';
+import StudentDetail from './pages/student/detail';
+import MealMenu from './pages/meal/index';
+import QnA from './pages/qna/index';
+import QnADetail from './pages/qna/detail';
+import RepairReport from './pages/repair/index';
 
 const App: React.FC = () => {
   const [questions, setQuestions] = useState([
@@ -39,17 +40,20 @@ const App: React.FC = () => {
 
   return (
     <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/room-change" element={<RoomChange />} />
-          <Route path="/student-management" element={<StudentManagement />} />
-          <Route path="/meal-menu" element={<MealMenu />} />
-          <Route path="/qna" element={<QnA questions={questions} setQuestions={setQuestions} />} />
-          <Route path="/qna/:id" element={<QnADetail questions={questions} setQuestions={setQuestions} />} />
-          <Route path="/repair-report" element={<RepairReport />} />
-        </Routes>
-      </Layout>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="room-change" element={<RoomChange />} />
+          <Route path="student">
+            <Route index element={<StudentManagement />} />
+            <Route path=":id" element={<StudentDetail />} />
+          </Route>
+          <Route path="repair" element={<RepairReport />} />
+          <Route path="qna" element={<QnA />} />
+          <Route path="qna/:id" element={<QnADetail />} />
+          <Route path="meal" element={<MealMenu />} />
+        </Route>
+      </Routes>
     </Router>
   );
 };

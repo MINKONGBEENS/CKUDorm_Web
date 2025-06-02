@@ -3,12 +3,15 @@ import React, { useState, useEffect } from "react";
 import * as echarts from "echarts";
 import * as XLSX from "xlsx";
 import { useNavigate } from 'react-router-dom';
+import StudentSearch from '../../components/StudentSearch';
+import { Student } from '../../api/types';
+import { STUDENT_STATUS, STUDENT_GRADE } from '../../constants/student';
 
 const StudentManagement: React.FC = () => {
   const navigate = useNavigate();
   // 모달 상태 관리
   const [showModal, setShowModal] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState<any>(null);
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [showBulkEditModal, setShowBulkEditModal] = useState(false);
@@ -20,42 +23,72 @@ const StudentManagement: React.FC = () => {
   });
   // 정렬 방향 상태 추가
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const [students, setStudents] = useState([
+  const [students, setStudents] = useState<Student[]>([
     {
       id: 1,
       name: '김민준',
       studentId: '20250101',
       room: '302',
-      status: '재학',
+      status: STUDENT_STATUS.ENROLLED,
       phone: '010-1234-5678',
-      email: 'student1@example.com'
+      email: 'student1@example.com',
+      grade: STUDENT_GRADE.FIRST,
+      department: '컴퓨터공학과',
+      college: '공과대학',
+      contact: '010-1234-5678',
+      checkInDate: '2024-03-01',
+      checkOutDate: '2024-12-31',
+      points: [],
+      totalMeritPoints: 0,
+      totalDemeritPoints: 0
     },
     {
       id: 2,
       name: '이지원',
       studentId: '20250102',
       room: '405',
-      status: '재학',
+      status: STUDENT_STATUS.ENROLLED,
       phone: '010-2345-6789',
-      email: 'student2@example.com'
+      email: 'student2@example.com',
+      grade: STUDENT_GRADE.SECOND,
+      department: '전자공학과',
+      college: '공과대학',
+      contact: '010-2345-6789',
+      checkInDate: '2024-03-01',
+      checkOutDate: '2024-12-31',
+      points: [],
+      totalMeritPoints: 0,
+      totalDemeritPoints: 0
     },
     {
       id: 3,
       name: '박서연',
       studentId: '20250103',
       room: '201',
-      status: '재학',
+      status: STUDENT_STATUS.ENROLLED,
       phone: '010-3456-7890',
-      email: 'student3@example.com'
+      email: 'student3@example.com',
+      grade: STUDENT_GRADE.THIRD,
+      department: '소프트웨어학과',
+      college: '공과대학',
+      contact: '010-3456-7890',
+      checkInDate: '2024-03-01',
+      checkOutDate: '2024-12-31',
+      points: [],
+      totalMeritPoints: 0,
+      totalDemeritPoints: 0
     }
   ]);
 
-  const [newStudent, setNewStudent] = useState({
+  const [newStudent, setNewStudent] = useState<Partial<Student>>({
     name: '',
     studentId: '',
     room: '',
     phone: '',
-    email: ''
+    email: '',
+    points: [],
+    totalMeritPoints: 0,
+    totalDemeritPoints: 0
   });
 
   const showToastMessage = (message: string) => {
@@ -91,10 +124,12 @@ const StudentManagement: React.FC = () => {
     }
   };
   // 필터 상태 관리
-  const [searchTerm, setSearchTerm] = useState("");
-  const [gradeFilter, setGradeFilter] = useState("전체");
-  const [collegeFilter, setCollegeFilter] = useState("전체");
-  const [statusFilter, setStatusFilter] = useState("전체");
+  const [searchFilters, setSearchFilters] = useState({
+    searchTerm: '',
+    status: '전체',
+    room: '',
+    grade: '전체'
+  });
   const [sortBy, setSortBy] = useState("이름순");
   // 알림 상태
   const [showNotifications, setShowNotifications] = useState(false);
@@ -124,42 +159,35 @@ const StudentManagement: React.FC = () => {
     },
   ];
   // 필터링된 학생 목록
-  const filteredStudents = students
-    .filter((student) => {
-      const matchesSearch =
-        student.name.includes(searchTerm) ||
-        student.studentId.includes(searchTerm) ||
-        student.department.includes(searchTerm);
-      const matchesGrade =
-        gradeFilter === "전체" || student.grade === gradeFilter;
-      const matchesCollege =
-        collegeFilter === "전체" || student.college === collegeFilter;
-      const matchesStatus =
-        statusFilter === "전체" || student.status === statusFilter;
-      return matchesSearch && matchesGrade && matchesCollege && matchesStatus;
-    })
-    .sort((a, b) => {
-      let comparison = 0;
-      if (sortBy === "이름순") {
-        comparison = a.name.localeCompare(b.name);
-      } else if (sortBy === "학번순") {
-        comparison = a.studentId.localeCompare(b.studentId);
-      } else if (sortBy === "입주일순") {
-        comparison =
-          new Date(a.checkInDate).getTime() - new Date(b.checkInDate).getTime();
-      } else if (sortBy === "퇴사예정일순") {
-        comparison =
-          new Date(a.checkOutDate).getTime() -
-          new Date(b.checkOutDate).getTime();
-      } else if (sortBy === "호실순") {
-        comparison = a.room.localeCompare(b.room);
-      } else if (sortBy === "학과순") {
-        comparison = a.department.localeCompare(b.department);
-      } else if (sortBy === "상태순") {
-        comparison = a.status.localeCompare(b.status);
-      }
-      return sortDirection === "asc" ? comparison : -comparison;
-    });
+  const filteredStudents = students.filter((student) => {
+    const matchesSearch = 
+      searchFilters.searchTerm === '' ||
+      student.name.toLowerCase().includes(searchFilters.searchTerm.toLowerCase()) ||
+      student.studentId.toLowerCase().includes(searchFilters.searchTerm.toLowerCase()) ||
+      student.phone.includes(searchFilters.searchTerm) ||
+      student.email.toLowerCase().includes(searchFilters.searchTerm.toLowerCase());
+
+    const matchesStatus =
+      searchFilters.status === '전체' || student.status === searchFilters.status;
+
+    const matchesRoom =
+      searchFilters.room === '' || student.room.includes(searchFilters.room);
+
+    const matchesGrade =
+      searchFilters.grade === '전체' || student.grade === searchFilters.grade;
+
+    return matchesSearch && matchesStatus && matchesRoom && matchesGrade;
+  }).sort((a, b) => {
+    let comparison = 0;
+    if (sortBy === "이름순") {
+      comparison = a.name.localeCompare(b.name);
+    } else if (sortBy === "학번순") {
+      comparison = a.studentId.localeCompare(b.studentId);
+    } else if (sortBy === "호실순") {
+      comparison = a.room.localeCompare(b.room);
+    }
+    return sortDirection === "asc" ? comparison : -comparison;
+  });
   // 정렬 방향 토글 함수
   const toggleSortDirection = () => {
     setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
@@ -185,13 +213,36 @@ const StudentManagement: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const student = {
+    if (!newStudent.name || !newStudent.studentId || !newStudent.room || !newStudent.phone || !newStudent.email) {
+      showToastMessage("모든 필드를 입력해주세요.");
+      return;
+    }
+
+    const student: Student = {
       id: students.length + 1,
-      ...newStudent,
-      status: '재학'
+      name: newStudent.name,
+      studentId: newStudent.studentId,
+      room: newStudent.room,
+      phone: newStudent.phone,
+      email: newStudent.email,
+      status: STUDENT_STATUS.ENROLLED,
+      grade: STUDENT_GRADE.FIRST,
+      department: '',
+      college: '',
+      contact: newStudent.phone,
+      checkInDate: new Date().toISOString().split('T')[0],
+      checkOutDate: '',
+      points: [],
+      totalMeritPoints: 0,
+      totalDemeritPoints: 0
     };
+    
     setStudents([student, ...students]);
-    setNewStudent({ name: '', studentId: '', room: '', phone: '', email: '' });
+    setNewStudent({ name: '', studentId: '', room: '', phone: '', email: '', points: [], totalMeritPoints: 0, totalDemeritPoints: 0 });
+  };
+
+  const handleSearch = (filters: any) => {
+    setSearchFilters(filters);
   };
 
   return (
@@ -206,6 +257,12 @@ const StudentManagement: React.FC = () => {
           </button>
           <h1 className="text-2xl font-bold">학생 관리</h1>
         </div>
+        <button
+          onClick={handleExcelDownload}
+          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+        >
+          엑셀 다운로드
+        </button>
       </div>
 
       {/* 학생 등록 폼 */}
@@ -283,63 +340,75 @@ const StudentManagement: React.FC = () => {
         </form>
       </div>
 
+      {/* 학생 검색 */}
+      <div className="mb-8">
+        <h2 className="text-lg font-bold mb-4">학생 검색</h2>
+        <StudentSearch onSearch={handleSearch} />
+      </div>
+
       {/* 학생 목록 */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100">
-        <div className="p-6 border-b border-gray-100">
-          <h2 className="text-lg font-bold">학생 목록</h2>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-gray-50">
-                <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  이름
-                </th>
-                <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  학번
-                </th>
-                <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  호실
-                </th>
-                <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  상태
-                </th>
-                <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  전화번호
-                </th>
-                <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  이메일
-                </th>
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                이름
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                학번
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                호실
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                상태
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                연락처
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                이메일
+              </th>
+              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                관리
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {filteredStudents.map((student) => (
+              <tr key={student.id}>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm font-medium text-gray-900">{student.name}</div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-900">{student.studentId}</div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-900">{student.room}</div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(student.status)}`}>
+                    {student.status}
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {student.phone}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {student.email}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <button
+                    onClick={() => navigate(`/student/${student.id}`)}
+                    className="text-indigo-600 hover:text-indigo-900"
+                  >
+                    상세보기
+                  </button>
+                </td>
               </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {students.map((student) => (
-                <tr key={student.id} className="hover:bg-gray-50">
-                  <td className="py-4 px-6 text-sm text-gray-800">
-                    {student.name}
-                  </td>
-                  <td className="py-4 px-6 text-sm text-gray-800">
-                    {student.studentId}
-                  </td>
-                  <td className="py-4 px-6 text-sm text-gray-800">
-                    {student.room}
-                  </td>
-                  <td className="py-4 px-6 text-sm">
-                    <span className="inline-block px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
-                      {student.status}
-                    </span>
-                  </td>
-                  <td className="py-4 px-6 text-sm text-gray-800">
-                    {student.phone}
-                  </td>
-                  <td className="py-4 px-6 text-sm text-gray-800">
-                    {student.email}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
