@@ -1,7 +1,7 @@
 // The exported code uses Tailwind CSS. Install Tailwind CSS in your dev environment to ensure all styles work.
 import React, { useState, useEffect } from "react";
 import * as echarts from "echarts";
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 import { useNavigate } from 'react-router-dom';
 import StudentSearch from '../../components/StudentSearch';
 import { Student } from '../../api/types';
@@ -96,31 +96,65 @@ const StudentManagement: React.FC = () => {
     setShowToast(true);
     setTimeout(() => setShowToast(false), 3000);
   };
-  const handleExcelDownload = () => {
+  const handleExcelDownload = async () => {
     try {
       showToastMessage("다운로드가 시작되었습니다");
-      const downloadData = students.map((student) => ({
-        이름: student.name,
-        학번: student.studentId,
-        학과: student.department,
-        단과대학: student.college,
-        학년: `${student.grade}학년`,
-        호실: student.room,
-        상태: student.status,
-        연락처: student.contact,
-        입주일: student.checkInDate,
-        퇴사예정일: student.checkOutDate,
-      }));
-      const ws = XLSX.utils.json_to_sheet(downloadData);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "입주사생 목록");
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet("입주사생 목록");
+
+      // 헤더 설정
+      worksheet.columns = [
+        { header: '이름', key: 'name' },
+        { header: '학번', key: 'studentId' },
+        { header: '학과', key: 'department' },
+        { header: '단과대학', key: 'college' },
+        { header: '학년', key: 'grade' },
+        { header: '호실', key: 'room' },
+        { header: '상태', key: 'status' },
+        { header: '연락처', key: 'contact' },
+        { header: '입주일', key: 'checkInDate' },
+        { header: '퇴사예정일', key: 'checkOutDate' }
+      ];
+
+      // 데이터 추가
+      students.forEach(student => {
+        worksheet.addRow({
+          name: student.name,
+          studentId: student.studentId,
+          department: student.department,
+          college: student.college,
+          grade: `${student.grade}학년`,
+          room: student.room,
+          status: student.status,
+          contact: student.contact,
+          checkInDate: student.checkInDate,
+          checkOutDate: student.checkOutDate
+        });
+      });
+
+      // 스타일 적용
+      worksheet.getRow(1).font = { bold: true };
+      worksheet.columns.forEach(column => {
+        column.width = 15;
+      });
+
+      // 파일 저장
       const today = new Date().toISOString().split("T")[0];
-      XLSX.writeFile(wb, `입주사생_목록_${today}.xlsx`);
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `입주사생_목록_${today}.xlsx`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+
       setTimeout(() => {
         showToastMessage("파일이 성공적으로 다운로드되었습니다");
       }, 1000);
     } catch (error) {
       showToastMessage("다운로드 중 오류가 발생했습니다");
+      console.error('Excel 다운로드 중 오류:', error);
     }
   };
   // 필터 상태 관리

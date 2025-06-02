@@ -190,6 +190,10 @@ const StudentDetail: React.FC = () => {
             <p className="text-sm text-red-600">누적 벌점</p>
             <p className="text-2xl font-bold text-red-600">{student.totalDemeritPoints}점</p>
           </div>
+          <div className="flex-1 bg-blue-50 p-4 rounded-lg">
+            <p className="text-sm text-blue-600">합산 점수</p>
+            <p className="text-2xl font-bold text-blue-600">{student.totalMeritPoints - student.totalDemeritPoints >= 0 ? '+' : ''}{student.totalMeritPoints - student.totalDemeritPoints}점</p>
+          </div>
         </div>
         <table className="min-w-full">
           <thead>

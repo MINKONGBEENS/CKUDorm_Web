@@ -49,8 +49,10 @@ const App: React.FC = () => {
             <Route path=":id" element={<StudentDetail />} />
           </Route>
           <Route path="repair" element={<RepairReport />} />
-          <Route path="qna" element={<QnA />} />
-          <Route path="qna/:id" element={<QnADetail />} />
+          <Route path="qna">
+            <Route index element={<QnA questions={questions} setQuestions={setQuestions} />} />
+            <Route path=":id" element={<QnADetail questions={questions} setQuestions={setQuestions} />} />
+          </Route>
           <Route path="meal" element={<MealMenu />} />
         </Route>
       </Routes>

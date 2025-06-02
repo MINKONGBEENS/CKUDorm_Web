@@ -1,9 +1,18 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
+type Question = {
+  id: number;
+  title: string;
+  category: string;
+  content: string;
+  date: string;
+  answer: string;
+};
+
 interface QnADetailProps {
-  questions: any[];
-  setQuestions: React.Dispatch<React.SetStateAction<any[]>>;
+  questions: Question[];
+  setQuestions: React.Dispatch<React.SetStateAction<Question[]>>;
 }
 
 const QnADetail: React.FC<QnADetailProps> = ({ questions, setQuestions }) => {
