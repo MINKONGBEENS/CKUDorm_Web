@@ -15,7 +15,7 @@
 ## ✨ 주요 기능
 
 <div align="center">
-  <img src="docs/images/student.png" alt="CKU 기숙사 관리 시스템 미리보기" width="800"/>
+  <img src="docs/images/dashboard.png" alt="CKU 기숙사 관리 시스템 미리보기" width="800"/>
 </div>
 
 ### 🎓 학생 관리
