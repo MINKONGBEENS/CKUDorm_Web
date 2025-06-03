@@ -1,10 +1,6 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { Pool } from 'pg';
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
-});
+import { executeQuery, DatabaseError } from '../src/lib/db';
+import { Student } from '../src/types/types';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { search } = req.query;
@@ -31,17 +27,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       values = [`%${search}%`];
     }
 
-    console.log('실행되는 쿼리:', query);
-    console.log('검색어:', search);
-
-    const result = await pool.query(query, values);
-    res.status(200).json(result.rows);
+    const students = await executeQuery<Student>(query, values);
+    res.status(200).json(students);
   } catch (err) {
-    console.error('DB 조회 실패. 에러 내용:', err);
-    if (err instanceof Error) {
-      res.status(500).json({ error: `DB 조회 실패: ${err.message}` });
+    console.error('학생 데이터 조회 실패:', err);
+    if (err instanceof DatabaseError) {
+      res.status(500).json({ error: `데이터베이스 오류: ${err.message}` });
     } else {
-      res.status(500).json({ error: 'DB 조회 실패: 알 수 없는 에러' });
+      res.status(500).json({ error: '서버 오류가 발생했습니다.' });
     }
   }
 } 
