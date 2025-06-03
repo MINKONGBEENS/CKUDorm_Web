@@ -1,27 +1,48 @@
 import React, { useState, useEffect } from 'react';
 import { Student } from '@/types/types';
 
+interface PaginationInfo {
+  total: number;
+  currentPage: number;
+  itemsPerPage: number;
+  totalPages: number;
+}
+
 const StudentListPage: React.FC = () => {
   const [students, setStudents] = useState<Student[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
   const [showEditForm, setShowEditForm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [pagination, setPagination] = useState<PaginationInfo>({
+    total: 0,
+    currentPage: 1,
+    itemsPerPage: 10,
+    totalPages: 1
+  });
 
   // 학생 목록 불러오기
-  const fetchStudents = async (search?: string) => {
+  const fetchStudents = async (search?: string, page: number = 1) => {
     setIsLoading(true);
     try {
-      const url = search 
-        ? `/api/managementStudent?search=${encodeURIComponent(search)}` 
-        : '/api/managementStudent';
-      const response = await fetch(url);
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || '학생 데이터를 불러오는데 실패했습니다.');
-      }
+      const url = new URL('/api/managementStudent', window.location.origin);
+      if (search) url.searchParams.set('search', search);
+      url.searchParams.set('page', page.toString());
+      url.searchParams.set('limit', pagination.itemsPerPage.toString());
+
+      const response = await fetch(url.toString());
       const data = await response.json();
-      setStudents(data);
+      
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || '학생 데이터를 불러오는데 실패했습니다.');
+      }
+
+      if (!Array.isArray(data.data)) {
+        throw new Error('서버에서 잘못된 형식의 데이터를 반환했습니다.');
+      }
+
+      setStudents(data.data);
+      setPagination(data.pagination);
     } catch (error) {
       console.error('Error fetching students:', error);
       alert(error instanceof Error ? error.message : '학생 데이터를 불러오는데 실패했습니다.');
@@ -38,7 +59,7 @@ const StudentListPage: React.FC = () => {
   // 검색어 변경시 실시간 검색
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
-      fetchStudents(searchTerm);
+      fetchStudents(searchTerm, 1); // 검색 시 첫 페이지로 이동
     }, 300);
 
     return () => clearTimeout(debounceTimer);
@@ -48,11 +69,16 @@ const StudentListPage: React.FC = () => {
     if (!confirm('이 학생을 삭제하시겠습니까?')) return;
     
     try {
-      const response = await fetch(`/api/students?id=${id}`, {
+      const response = await fetch(`/api/managementStudent?id=${id}`, {
         method: 'DELETE',
       });
       
       if (!response.ok) throw new Error('학생 삭제에 실패했습니다.');
+      
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.error || '학생 삭제에 실패했습니다.');
+      }
       
       setStudents(students.filter(s => s.id !== id));
       alert('학생이 삭제되었습니다.');
@@ -71,7 +97,7 @@ const StudentListPage: React.FC = () => {
     if (!editingStudent) return;
     
     try {
-      const response = await fetch('/api/students', {
+      const response = await fetch('/api/managementStudent', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -81,8 +107,13 @@ const StudentListPage: React.FC = () => {
 
       if (!response.ok) throw new Error('학생 정보 수정에 실패했습니다.');
       
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.error || '학생 정보 수정에 실패했습니다.');
+      }
+      
       setStudents(students.map(s => 
-        s.id === editingStudent.id ? editingStudent : s
+        s.id === editingStudent.id ? data.data : s
       ));
       
       setEditingStudent(null);
@@ -92,6 +123,10 @@ const StudentListPage: React.FC = () => {
       console.error('Error updating student:', error);
       alert('학생 정보 수정에 실패했습니다.');
     }
+  };
+
+  const handlePageChange = (newPage: number) => {
+    fetchStudents(searchTerm, newPage);
   };
 
   return (
@@ -115,49 +150,92 @@ const StudentListPage: React.FC = () => {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학번</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">이름</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학과</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학년</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">기숙사</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">호실</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">연락처</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">관리</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {students.map((student) => (
-                <tr key={student.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{student.student_id}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{student.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{student.department_name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{student.grade}학년</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{student.dormitory}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{student.room_number}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{student.phone}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button
-                      onClick={() => handleEditStudent(student)}
-                      className="text-indigo-600 hover:text-indigo-900 mr-4"
-                    >
-                      수정
-                    </button>
-                    <button
-                      onClick={() => handleDeleteStudent(student.id)}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      삭제
-                    </button>
-                  </td>
+        <>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학번</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">이름</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학과</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학년</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">기숙사</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">호실</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">연락처</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">관리</th>
                 </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {students.map((student) => (
+                  <tr key={student.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{student.student_id}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{student.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{student.department_name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{student.grade}학년</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{student.dormitory}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{student.room_number}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{student.phone}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <button
+                        onClick={() => handleEditStudent(student)}
+                        className="text-indigo-600 hover:text-indigo-900 mr-4"
+                      >
+                        수정
+                      </button>
+                      <button
+                        onClick={() => handleDeleteStudent(student.id)}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        삭제
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* 페이지네이션 */}
+          <div className="mt-4 flex justify-center">
+            <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+              <button
+                onClick={() => handlePageChange(pagination.currentPage - 1)}
+                disabled={pagination.currentPage === 1}
+                className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${
+                  pagination.currentPage === 1
+                    ? 'text-gray-300 cursor-not-allowed'
+                    : 'text-gray-500 hover:bg-gray-50'
+                }`}
+              >
+                이전
+              </button>
+              {[...Array(pagination.totalPages)].map((_, i) => (
+                <button
+                  key={i + 1}
+                  onClick={() => handlePageChange(i + 1)}
+                  className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                    pagination.currentPage === i + 1
+                      ? 'z-10 bg-[#006272] border-[#006272] text-white'
+                      : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                  }`}
+                >
+                  {i + 1}
+                </button>
               ))}
-            </tbody>
-          </table>
-        </div>
+              <button
+                onClick={() => handlePageChange(pagination.currentPage + 1)}
+                disabled={pagination.currentPage === pagination.totalPages}
+                className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${
+                  pagination.currentPage === pagination.totalPages
+                    ? 'text-gray-300 cursor-not-allowed'
+                    : 'text-gray-500 hover:bg-gray-50'
+                }`}
+              >
+                다음
+              </button>
+            </nav>
+          </div>
+        </>
       )}
 
       {/* 학생 수정 폼 */}
@@ -225,10 +303,9 @@ const StudentListPage: React.FC = () => {
                   onChange={(e) => setEditingStudent({...editingStudent, dormitory: e.target.value})}
                   className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="남자기숙사A">남자기숙사A</option>
-                  <option value="남자기숙사B">남자기숙사B</option>
-                  <option value="여자기숙사A">여자기숙사A</option>
-                  <option value="여자기숙사B">여자기숙사B</option>
+                  <option value="우정원">우정원</option>
+                  <option value="창조원">창조원</option>
+                  <option value="진리원">진리원</option>
                 </select>
               </div>
               <div>
