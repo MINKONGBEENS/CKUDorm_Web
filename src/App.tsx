@@ -3,12 +3,15 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import Dashboard from './pages/dashboard';
 import RoomChange from './pages/room/index';
-import StudentManagement from './pages/student/index';
-import StudentDetail from './pages/student/detail';
 import MealMenu from './pages/meal/index';
 import QnA from './pages/qna/index';
 import QnADetail from './pages/qna/detail';
 import RepairReport from './pages/repair/index';
+import StudentList from './pages/student/index';
+import PointsManagement from './pages/points/index';
+import OvernightManagement from './pages/overnight/index';
+import NoticeManagement from './pages/notice/index';
+import AdminManagement from './pages/admin/index';
 
 const App: React.FC = () => {
   const [questions, setQuestions] = useState([
@@ -43,16 +46,15 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
+          <Route path="student" element={<StudentList />} />
+          <Route path="points" element={<PointsManagement />} />
+          <Route path="overnight" element={<OvernightManagement />} />
+          <Route path="notice" element={<NoticeManagement />} />
+          <Route path="admin" element={<AdminManagement />} />
           <Route path="room-change" element={<RoomChange />} />
-          <Route path="student">
-            <Route index element={<StudentManagement />} />
-            <Route path=":id" element={<StudentDetail />} />
-          </Route>
           <Route path="repair" element={<RepairReport />} />
-          <Route path="qna">
-            <Route index element={<QnA questions={questions} setQuestions={setQuestions} />} />
-            <Route path=":id" element={<QnADetail questions={questions} setQuestions={setQuestions} />} />
-          </Route>
+          <Route path="qna" element={<QnA questions={questions} setQuestions={setQuestions} />} />
+          <Route path="qna/:id" element={<QnADetail questions={questions} setQuestions={setQuestions} />} />
           <Route path="meal" element={<MealMenu />} />
         </Route>
       </Routes>

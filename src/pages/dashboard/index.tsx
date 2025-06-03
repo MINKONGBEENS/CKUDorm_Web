@@ -1,5 +1,6 @@
 // The exported code uses Tailwind CSS. Install Tailwind CSS in your dev environment to ensure all styles work.
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const Dashboard: React.FC = () => {
   const [showNotifications, setShowNotifications] = useState(false);
@@ -292,12 +293,12 @@ const Dashboard: React.FC = () => {
         <div className="bg-white rounded-lg shadow-sm border border-gray-100">
           <div className="p-6 border-b border-gray-100 flex justify-between items-center">
             <h2 className="text-lg font-bold">최근 공지사항</h2>
-            <a
-              href="#"
+            <Link
+              to="/notice"
               className="text-[#006272] text-sm font-medium cursor-pointer"
             >
               전체 보기
-            </a>
+            </Link>
           </div>
           <div className="p-4">
             <ul className="divide-y divide-gray-100">
