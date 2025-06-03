@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 type Question = {
   id: number;
@@ -12,12 +12,9 @@ type Question = {
 
 interface QnAProps {
   questions: Question[];
-  setQuestions: React.Dispatch<React.SetStateAction<Question[]>>;
 }
 
-const QnA: React.FC<QnAProps> = ({ questions, setQuestions }) => {
-  const navigate = useNavigate();
-
+const QnA: React.FC<QnAProps> = ({ questions }) => {
   return (
     <div className="p-8">
       <div className="flex justify-between items-center mb-8">

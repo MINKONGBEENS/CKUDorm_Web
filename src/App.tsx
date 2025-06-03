@@ -53,7 +53,7 @@ const App: React.FC = () => {
           <Route path="admin" element={<AdminManagement />} />
           <Route path="room-change" element={<RoomChange />} />
           <Route path="repair" element={<RepairReport />} />
-          <Route path="qna" element={<QnA questions={questions} setQuestions={setQuestions} />} />
+          <Route path="qna" element={<QnA questions={questions} />} />
           <Route path="qna/:id" element={<QnADetail questions={questions} setQuestions={setQuestions} />} />
           <Route path="meal" element={<MealMenu />} />
         </Route>

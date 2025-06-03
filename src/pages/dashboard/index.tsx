@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 
 const Dashboard: React.FC = () => {
   const [showNotifications, setShowNotifications] = useState(false);
-  const [hasNewNotifications, setHasNewNotifications] = useState(true);
 
   // 알림 데이터
   const notifications = [
@@ -37,55 +36,6 @@ const Dashboard: React.FC = () => {
     pendingStayouts: 5,
     pendingRepairs: 3,
   };
-
-  // 최근 입주 신청 데이터
-  const recentApplications = [
-    {
-      id: 1,
-      name: "김민준",
-      studentId: "20250101",
-      department: "컴퓨터공학과",
-      room: "302",
-      date: "2025-05-25",
-      status: "승인 대기",
-    },
-    {
-      id: 2,
-      name: "이지원",
-      studentId: "20250102",
-      department: "경영학과",
-      room: "401",
-      date: "2025-05-24",
-      status: "승인 완료",
-    },
-    {
-      id: 3,
-      name: "박서연",
-      studentId: "20250103",
-      department: "전자공학과",
-      room: "503",
-      date: "2025-05-24",
-      status: "승인 대기",
-    },
-    {
-      id: 4,
-      name: "최준호",
-      studentId: "20250104",
-      department: "건축학과",
-      room: "201",
-      date: "2025-05-23",
-      status: "승인 완료",
-    },
-    {
-      id: 5,
-      name: "정다은",
-      studentId: "20250105",
-      department: "심리학과",
-      room: "402",
-      date: "2025-05-22",
-      status: "승인 완료",
-    },
-  ];
 
   // 최근 공지사항 데이터
   const recentNotices = [
@@ -133,54 +83,51 @@ const Dashboard: React.FC = () => {
               onClick={() => setShowNotifications(!showNotifications)}
             >
               <i className="fas fa-bell text-xl"></i>
-              {hasNewNotifications && (
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+              {/* 알림 모달 */}
+              {showNotifications && (
+                <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                  <div className="p-4 border-b border-gray-100">
+                    <h3 className="font-medium">알림</h3>
+                  </div>
+                  <div className="max-h-80 overflow-y-auto">
+                    {notifications.length > 0 ? (
+                      notifications.map((notification) => (
+                        <div
+                          key={notification.id}
+                          className={`p-4 border-b border-gray-100 ${notification.isNew ? "bg-blue-50" : ""}`}
+                        >
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <h4 className="font-medium text-sm">
+                                {notification.title}
+                              </h4>
+                              <p className="text-gray-600 text-sm mt-1">
+                                {notification.message}
+                              </p>
+                            </div>
+                            <span className="text-xs text-gray-500">
+                              {notification.time}
+                            </span>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="p-4 text-center text-gray-500">
+                        새로운 알림이 없습니다
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-3 text-center border-t border-gray-100">
+                    <a
+                      href="#"
+                      className="text-[#006272] text-sm font-medium"
+                    >
+                      모든 알림 보기
+                    </a>
+                  </div>
+                </div>
               )}
             </button>
-            {/* 알림 모달 */}
-            {showNotifications && (
-              <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
-                <div className="p-4 border-b border-gray-100">
-                  <h3 className="font-medium">알림</h3>
-                </div>
-                <div className="max-h-80 overflow-y-auto">
-                  {notifications.length > 0 ? (
-                    notifications.map((notification) => (
-                      <div
-                        key={notification.id}
-                        className={`p-4 border-b border-gray-100 ${notification.isNew ? "bg-blue-50" : ""}`}
-                      >
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h4 className="font-medium text-sm">
-                              {notification.title}
-                            </h4>
-                            <p className="text-gray-600 text-sm mt-1">
-                              {notification.message}
-                            </p>
-                          </div>
-                          <span className="text-xs text-gray-500">
-                            {notification.time}
-                          </span>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="p-4 text-center text-gray-500">
-                      새로운 알림이 없습니다
-                    </div>
-                  )}
-                </div>
-                <div className="p-3 text-center border-t border-gray-100">
-                  <a
-                    href="#"
-                    className="text-[#006272] text-sm font-medium"
-                  >
-                    모든 알림 보기
-                  </a>
-                </div>
-              </div>
-            )}
           </div>
           <div className="flex items-center cursor-pointer">
             <div className="w-10 h-10 bg-[#006272] rounded-full flex items-center justify-center text-white font-medium">
