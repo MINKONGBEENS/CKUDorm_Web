@@ -14,9 +14,10 @@ export const pool = new Pool({
   ssl: {
     rejectUnauthorized: false
   },
-  max: 1, // 연결 수를 1개로 제한
-  idleTimeoutMillis: 0, // 연결 유지
-  connectionTimeoutMillis: 10000, // 연결 타임아웃 10초
+  max: 2, // Serverless 환경에 맞게 조정
+  idleTimeoutMillis: 30000, // 30초
+  connectionTimeoutMillis: 15000, // 15초 (Neon 권장)
+  allowExitOnIdle: true // Serverless 환경에서 연결 정리
 });
 
 // 연결 테스트
@@ -43,13 +44,14 @@ export async function testConnection() {
   } catch (error) {
     console.error('Database connection test failed:', {
       message: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined
+      stack: error instanceof Error ? error.stack : undefined,
+      connectionString: connectionString.replace(/:[^:@]*@/, ':****@') // 비밀번호 가림
     });
     return false;
   } finally {
     if (client) {
       try {
-        await client.release();
+        await client.release(true);
       } catch (e) {
         console.error('Error releasing client:', e);
       }
@@ -73,20 +75,18 @@ export async function executeQuery<T>(
     client = await pool.connect();
     console.log('Executing query:', {
       query,
-      values,
       params: values.length
     });
     
     const result = await client.query(query, values);
     console.log('Query executed successfully, rows:', result.rows.length);
-    
     return result.rows;
   } catch (error) {
     console.error('Database query error:', {
       message: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined,
       query,
-      values
+      params: values.length
     });
     
     throw new DatabaseError(
@@ -96,7 +96,7 @@ export async function executeQuery<T>(
   } finally {
     if (client) {
       try {
-        await client.release();
+        await client.release(true);
       } catch (e) {
         console.error('Error releasing client:', e);
       }
