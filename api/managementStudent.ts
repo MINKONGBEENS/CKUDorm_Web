@@ -16,15 +16,14 @@ async function handler(req: VercelRequest, res: VercelResponse) {
   const { method, query, body } = req;
 
   try {
-    // 환경변수 로깅
-    console.log('Database URL exists:', !!process.env.DATABASE_URL);
-    
     // 데이터베이스 연결 테스트
     const isConnected = await testConnection();
     if (!isConnected) {
       throw new Error('데이터베이스 연결에 실패했습니다.');
     }
 
+    console.log('Request received:', { method, query });
+    
     switch (method) {
       case 'GET': {
         const { search, page = '1', limit = '10' } = query;
@@ -63,6 +62,10 @@ async function handler(req: VercelRequest, res: VercelResponse) {
           throw new Error('학생 수 조회에 실패했습니다.');
         }
 
+        if (!totalCount) {
+          totalCount = { count: '0' };
+        }
+
         // 페이지네이션된 데이터 조회
         let students;
         try {
@@ -81,17 +84,17 @@ async function handler(req: VercelRequest, res: VercelResponse) {
         }
 
         if (!students || !Array.isArray(students)) {
-          throw new Error('학생 데이터를 불러오는데 실패했습니다.');
+          students = [];
         }
 
         const response = {
           success: true,
           data: students,
           pagination: {
-            total: parseInt(totalCount?.count || '0'),
+            total: parseInt(totalCount.count),
             currentPage,
             itemsPerPage,
-            totalPages: Math.ceil(parseInt(totalCount?.count || '0') / itemsPerPage)
+            totalPages: Math.ceil(parseInt(totalCount.count) / itemsPerPage)
           }
         };
 

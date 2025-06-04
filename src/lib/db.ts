@@ -7,16 +7,16 @@ if (!process.env.DATABASE_URL) {
 console.log('Initializing database connection pool');
 
 const connectionString = process.env.DATABASE_URL;
-console.log('Connection string format valid:', connectionString.startsWith('postgresql://'));
+console.log('Connection string format valid:', connectionString.startsWith('postgres://'));
 
 export const pool = new Pool({
   connectionString,
   ssl: {
     rejectUnauthorized: false
   },
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 10000,
+  max: 1, // 연결 수를 1개로 제한
+  idleTimeoutMillis: 0, // 연결 유지
+  connectionTimeoutMillis: 10000, // 연결 타임아웃 10초
 });
 
 // 연결 테스트
@@ -26,7 +26,6 @@ pool.on('error', (err) => {
     stack: err.stack,
     error: err
   });
-  process.exit(-1);
 });
 
 pool.on('connect', () => {
@@ -49,7 +48,11 @@ export async function testConnection() {
     return false;
   } finally {
     if (client) {
-      client.release();
+      try {
+        await client.release();
+      } catch (e) {
+        console.error('Error releasing client:', e);
+      }
     }
   }
 }
@@ -92,7 +95,11 @@ export async function executeQuery<T>(
     );
   } finally {
     if (client) {
-      client.release();
+      try {
+        await client.release();
+      } catch (e) {
+        console.error('Error releasing client:', e);
+      }
     }
   }
 } 
