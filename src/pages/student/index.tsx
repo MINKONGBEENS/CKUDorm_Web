@@ -31,18 +31,32 @@ const StudentListPage: React.FC = () => {
       url.searchParams.set('limit', pagination.itemsPerPage.toString());
 
       const response = await fetch(url.toString());
-      const data = await response.json();
+      let data;
+      
+      try {
+        const textResponse = await response.text(); // 먼저 텍스트로 받아서
+        console.log('Raw response:', textResponse); // 원본 응답 로깅
+        data = JSON.parse(textResponse); // JSON 파싱 시도
+      } catch (parseError) {
+        console.error('JSON Parse Error:', parseError);
+        throw new Error('서버 응답을 처리하는데 실패했습니다.');
+      }
       
       if (!response.ok || !data.success) {
         throw new Error(data.error || '학생 데이터를 불러오는데 실패했습니다.');
       }
 
       if (!Array.isArray(data.data)) {
+        console.error('Invalid data format:', data);
         throw new Error('서버에서 잘못된 형식의 데이터를 반환했습니다.');
       }
 
       setStudents(data.data);
-      setPagination(data.pagination);
+      setPagination(prev => ({
+        ...prev,
+        ...data.pagination,
+        itemsPerPage: prev.itemsPerPage // 기존 itemsPerPage 유지
+      }));
     } catch (error) {
       console.error('Error fetching students:', error);
       alert(error instanceof Error ? error.message : '학생 데이터를 불러오는데 실패했습니다.');
