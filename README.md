@@ -1,168 +1,119 @@
 # 🏢 CKU 기숙사 관리 시스템
 
 <div align="center">
-  <img src="https://img.shields.io/badge/react-18.0.0-61DAFB?style=flat&logo=react"/>
-  <img src="https://img.shields.io/badge/typescript-5.0.0-3178C6?style=flat&logo=typescript"/>
-  <img src="https://img.shields.io/badge/tailwindcss-3.0.0-06B6D4?style=flat&logo=tailwindcss"/>
-  <img src="https://img.shields.io/badge/license-MIT-green"/>
+
+![CKU Dormitory Management System](https://via.placeholder.com/800x400?text=CKU+Dormitory+Management+System)
+
+[![React](https://img.shields.io/badge/React-18.2.0-61DAFB?logo=react)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0.0-3178C6?logo=typescript)](https://www.typescriptlang.org/)
+[![NestJS](https://img.shields.io/badge/NestJS-10.0.0-E0234E?logo=nestjs)](https://nestjs.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15.0-336791?logo=postgresql)](https://www.postgresql.org/)
+
 </div>
 
-<div align="center">
-  <h3>🎯 가톨릭관동대학교 기숙사 관리를 위한 웹 기반 관리 시스템</h3>
-  <p>학생 관리, 호실 관리, 시설 관리, 식단 관리 등 기숙사 운영에 필요한 모든 기능을 제공합니다.</p>
-</div>
+## 📋 프로젝트 개요
 
-## ✨ 주요 기능
+가톨릭관동대학교 기숙사 관리 시스템은 기숙사 운영의 효율성을 높이고 입주생들에게 더 나은 서비스를 제공하기 위한 웹 기반 통합 관리 시스템입니다.
 
-<div align="center">
-  <img src="docs/images/dashboard.png" alt="CKU 기숙사 관리 시스템 미리보기" width="800"/>
-</div>
+### 🎯 주요 기능
 
-### 🎓 학생 관리
-- ✅ 학생 정보 등록 및 조회
-- 🔍 상세 검색 기능 (이름, 학번, 호실, 상태 등)
-- ⭐ 상벌점 관리 시스템
-- 📊 엑셀 다운로드 기능
-
-### 🏠 호실 관리
-- 🔄 호실 배정 및 변경 관리
-- 📋 호실별 학생 현황 조회
-
-### 🛠 시설 관리
-- 📝 시설물 수리 신청 접수 및 처리
-- 📊 수리 현황 모니터링
-
-### 🍽 식단 관리
-- 📅 주간/월간 식단 등록 및 조회
-- 🍳 식단 정보 관리
-
-### 💬 Q&A 게시판
-- ❓ 질문 등록 및 답변
-- 🏷 카테고리별 조회 기능
+- **입주생 관리**: 입주생 정보 관리, 호실 배정, 상벌점 관리
+- **시설 관리**: 시설물 점검, 수리 요청 처리, 비품 관리
+- **식단 관리**: 식단 등록, 영양 정보 관리, 만족도 조사
+- **공지사항**: 공지 등록, 알림 발송, 열람 통계
+- **외박 관리**: 외박 신청, 승인 처리, 현황 관리
+- **관리자 기능**: 권한 관리, 통계 분석, 리포트 생성
 
 ## 🛠 기술 스택
 
-<div align="center">
-  <table>
-    <tr>
-      <th>분류</th>
-      <th>기술</th>
-    </tr>
-    <tr>
-      <td>Frontend</td>
-      <td>
-        <img src="https://img.shields.io/badge/react-61DAFB?style=flat&logo=react&logoColor=black"/>
-        <img src="https://img.shields.io/badge/typescript-3178C6?style=flat&logo=typescript&logoColor=white"/>
-        <img src="https://img.shields.io/badge/reactrouter-CA4245?style=flat&logo=reactrouter&logoColor=white"/>
-        <img src="https://img.shields.io/badge/tailwindcss-06B6D4?style=flat&logo=tailwindcss&logoColor=white"/>
-      </td>
-    </tr>
-    <tr>
-      <td>라이브러리</td>
-      <td>
-        <img src="https://img.shields.io/badge/echarts-AA344D?style=flat&logo=apacheecharts&logoColor=white"/>
-        <img src="https://img.shields.io/badge/xlsx-217346?style=flat&logo=microsoftexcel&logoColor=white"/>
-      </td>
-    </tr>
-  </table>
-</div>
+### 프론트엔드
+- React 18.2.0
+- TypeScript 5.0.0
+- Zustand 4.4.1
+- TailwindCSS 3.3.0
+
+### 백엔드
+- NestJS 10.0.0
+- TypeORM 0.3.17
+- PostgreSQL 15.0
+- Redis 7.0
+
+## 📚 프로젝트 구조
+
+```
+src/
+├── frontend/
+│   ├── components/     # 재사용 가능한 컴포넌트
+│   ├── pages/         # 페이지 컴포넌트
+│   ├── stores/        # Zustand 상태 관리
+│   └── utils/         # 유틸리티 함수
+│
+├── backend/
+│   ├── controllers/   # API 컨트롤러
+│   ├── services/      # 비즈니스 로직
+│   ├── entities/      # 데이터베이스 모델
+│   └── utils/         # 유틸리티 함수
+│
+└── docs/             # 프로젝트 문서
+    ├── 요구사항분석서.md
+    └── API문서.md
+```
 
 ## 🚀 시작하기
 
 ### 필수 요구사항
-- Node.js 18.0.0 이상
-- npm 또는 yarn
+- Node.js 18.x 이상
+- PostgreSQL 15.x
+- Redis 7.x
 
-### 설치 방법
+### 설치 및 실행
 
-1️⃣ 저장소 클론
+1. 저장소 클론
 ```bash
-git clone https://github.com/your-username/CKUDorm_Web.git
-cd CKUDorm_Web
+git clone https://github.com/your-username/ckudorm-web.git
+cd ckudorm-web
 ```
 
-2️⃣ 의존성 설치
+2. 의존성 설치
 ```bash
+# 프론트엔드
+cd frontend
 npm install
-# 또는
-yarn install
+
+# 백엔드
+cd backend
+npm install
 ```
 
-3️⃣ 개발 서버 실행
+3. 환경 변수 설정
 ```bash
+# .env 파일 생성
+cp .env.example .env
+```
+
+4. 개발 서버 실행
+```bash
+# 프론트엔드 (http://localhost:3000)
 npm run dev
-# 또는
-yarn dev
+
+# 백엔드 (http://localhost:4000)
+npm run start:dev
 ```
 
-4️⃣ 빌드
-```bash
-npm run build
-# 또는
-yarn build
-```
+## 📖 문서
 
-## 📁 프로젝트 구조
+- [요구사항 분석서](docs/요구사항분석서.md)
+- [API 문서](http://localhost:4000/api)
+- [컴포넌트 문서](http://localhost:6006)
 
-```
-src/
-├── 📂 api/          # API 타입 정의 및 통신 로직
-├── 📂 components/   # 재사용 가능한 컴포넌트
-├── 📂 constants/    # 상수 정의
-├── 📂 pages/        # 페이지 컴포넌트
-│   ├── 📂 dashboard/
-│   ├── 📂 student/
-│   ├── 📂 room/
-│   ├── 📂 repair/
-│   ├── 📂 meal/
-│   └── 📂 qna/
-└── 📂 types/        # 타입 정의
-```
+## 🔒 보안
 
-## 📱 주요 페이지 및 기능
+- JWT 기반 인증
+- RBAC 권한 관리
+- SSL/TLS 암호화
+- 데이터 암호화 (AES-256)
 
-<details>
-<summary><b>🎓 학생 관리 (/student)</b></summary>
-<br>
-- 학생 목록 조회 및 검색
-- 학생 등록 폼
-- 엑셀 다운로드
-- 상세 검색 필터
-</details>
-
-<details>
-<summary><b>👤 학생 상세 정보 (/student/:id)</b></summary>
-<br>
-- 기본 정보 표시
-- 상벌점 현황 및 이력
-- 상벌점 부여 기능
-</details>
-
-<details>
-<summary><b>🏠 호실 변경 관리 (/room-change)</b></summary>
-<br>
-- 호실 변경 신청 목록
-- 호실 배정 현황
-- 변경 요청 처리
-</details>
-
-<details>
-<summary><b>🛠 시설 보수 관리 (/repair)</b></summary>
-<br>
-- 수리 신청 목록
-- 처리 상태 관리
-- 신청 내역 조회
-</details>
-
-<details>
-<summary><b>💬 Q&A 게시판 (/qna)</b></summary>
-<br>
-- 질문 목록 및 상세 보기
-- 답변 등록 및 수정
-- 카테고리별 필터링
-</details>
-
-## 🤝 기여 방법
+## 🤝 기여하기
 
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
@@ -170,12 +121,20 @@ src/
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## 📄 라이선스
+## 📝 라이선스
 
-이 프로젝트는 MIT 라이선스를 따릅니다. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
+이 프로젝트는 MIT 라이선스로 배포됩니다. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
 
----
+## 👥 팀원
 
-<div align="center">
-  <sub>Built with ❤️ by CKU Dormitory Management Team</sub>
-</div> 
+- 홍길동 - 프론트엔드 개발
+- 김철수 - 백엔드 개발
+- 이영희 - UI/UX 디자인
+- 박지민 - 품질 관리
+
+## 📞 문의
+
+프로젝트에 대한 문의사항이 있으시면 아래로 연락해주세요:
+
+- Email: support@ckudorm.com
+- Issue: [GitHub Issues](https://github.com/your-username/ckudorm-web/issues) 
