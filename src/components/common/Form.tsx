@@ -22,7 +22,8 @@ export const validationRules = {
   }
 } as const;
 
-interface Session {
+// TODO: 인증 시스템 구현 시 사용될 세션 인터페이스
+/* interface Session {
   token: string;
   expiresIn: number;
   user: {
@@ -30,34 +31,36 @@ interface Session {
     username: string;
     role: string;
   };
-}
+} */
 
-interface InputProps {
-  /** 입력 필드 레이블 */
+// TODO: Input 컴포넌트 구현 시 사용될 Props 인터페이스
+/* interface InputProps {
+  /** 입력 필드 레이블 *//*
   label: string;
-  /** 에러 메시지 */
+  /** 에러 메시지 *//*
   error?: string;
-  /** 도움말 텍스트 */
+  /** 도움말 텍스트 *//*
   helperText?: string;
-  /** 추가 스타일 클래스 */
+  /** 추가 스타일 클래스 *//*
   className?: string;
-  /** 입력 필드 타입 */
+  /** 입력 필드 타입 *//*
   type: 'text' | 'password' | 'email' | 'number';
-  /** 필드 이름 */
+  /** 필드 이름 *//*
   name: string;
-  /** 필드 값 */
+  /** 필드 값 *//*
   value: string;
-  /** 값 변경 핸들러 */
+  /** 값 변경 핸들러 *//*
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
-  /** 필수 입력 여부 */
+  /** 필수 입력 여부 *//*
   required?: boolean;
-  /** 비활성화 상태 */
+  /** 비활성화 상태 *//*
   disabled?: boolean;
-  /** 플레이스홀더 */
+  /** 플레이스홀더 *//*
   placeholder?: string;
-}
+} */
 
-const inputStyles = {
+// TODO: Input 컴포넌트 구현 시 사용될 스타일 정의
+/* const inputStyles = {
   container: 'flex flex-col gap-1',
   label: 'text-sm font-medium text-gray-700',
   input: {
@@ -77,7 +80,7 @@ const inputStyles = {
   },
   helper: 'text-xs text-gray-500',
   error: 'text-xs text-red-500'
-} as const;
+} as const; */
 
 export const Form: React.FC<FormProps> = ({
   onSubmit,

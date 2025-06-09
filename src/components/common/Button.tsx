@@ -5,6 +5,8 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'danger';
   size?: 'sm' | 'md' | 'lg';
   isLoading?: boolean;
+  as?: React.ElementType;
+  to?: string;
 }
 
 const variantStyles = {
@@ -27,10 +29,11 @@ export const Button: React.FC<ButtonProps> = ({
   className,
   children,
   disabled,
+  as: Component = 'button',
   ...props
 }) => {
   return (
-    <button
+    <Component
       className={twMerge(
         'inline-flex justify-center items-center rounded-md font-medium shadow-sm',
         'focus:outline-none focus:ring-2 focus:ring-offset-2',
@@ -69,6 +72,6 @@ export const Button: React.FC<ButtonProps> = ({
       ) : (
         children
       )}
-    </button>
+    </Component>
   );
 }; 

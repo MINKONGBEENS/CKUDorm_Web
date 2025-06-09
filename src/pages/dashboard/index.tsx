@@ -1,6 +1,7 @@
 // The exported code uses Tailwind CSS. Install Tailwind CSS in your dev environment to ensure all styles work.
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+// TODO: 페이지 네비게이션 구현 시 사용될 Link 컴포넌트
+// import { Link } from 'react-router-dom';
 import { useDashboardStore } from '../../store/dashboard';
 import { NotificationPanel } from './components/NotificationPanel';
 import { StatsCard } from './components/StatsCard';
@@ -11,64 +12,15 @@ export const Dashboard: React.FC = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const { stats } = useDashboardStore();
 
-  // 알림 데이터
-  const notifications = [
-    {
-      id: 1,
-      title: "새로운 공지사항",
-      message: "2025년 여름방학 기숙사 운영 안내가 등록되었습니다.",
-      time: "10분 전",
-      isNew: true,
-    },
-    {
-      id: 2,
-      title: "고장수리 완료",
-      message: "302호 수도꼭지 수리가 완료되었습니다.",
-      time: "30분 전",
-      isNew: true,
-    },
-    {
-      id: 3,
-      title: "외박 신청 승인",
-      message: "김민준 학생의 외박 신청이 승인되었습니다.",
-      time: "1시간 전",
-      isNew: false,
-    },
-  ];
+  // TODO: 알림 시스템 구현 시 사용될 데이터
+  /* const notifications = [
+    // 알림 데이터 구조 정의
+  ]; */
 
-  // 최근 공지사항 데이터
-  const recentNotices = [
-    {
-      id: 1,
-      title: "2025년 여름방학 기숙사 운영 안내",
-      date: "2025-05-26",
-      category: "공지",
-    },
-    {
-      id: 2,
-      title: "기숙사 시설 점검 일정 안내",
-      date: "2025-05-24",
-      category: "공지",
-    },
-    {
-      id: 3,
-      title: "식당 메뉴 변경 안내",
-      date: "2025-05-22",
-      category: "식당",
-    },
-    {
-      id: 4,
-      title: "화재 대피 훈련 실시 안내",
-      date: "2025-05-20",
-      category: "안전",
-    },
-    {
-      id: 5,
-      title: "방학 중 기숙사 사용 신청 안내",
-      date: "2025-05-18",
-      category: "공지",
-    },
-  ];
+  // TODO: 공지사항 시스템 구현 시 사용될 데이터
+  /* const recentNotices = [
+    // 최근 공지사항 데이터 구조 정의
+  ]; */
 
   return (
     <div className="p-8">

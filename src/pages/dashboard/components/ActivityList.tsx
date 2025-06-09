@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 import { useDashboardStore } from '../../../store/dashboard';
 
+// TODO: 활동 유형 구분을 위한 type 변수 구현 예정
+/* type ActivityType = 'notice' | 'repair' | 'leave'; */
+
 type ActivityType = 'ALL' | 'REPAIR' | 'STAYOUT' | 'QNA';
 
 interface ActivityFilterButtonProps {
