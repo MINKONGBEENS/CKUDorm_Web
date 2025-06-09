@@ -25,11 +25,11 @@ export const useAuthStore = create<AuthState>()(
       login: async (username: string, password: string) => {
         try {
           // TODO: API 호출로 변경
-          if (username === 'admin' && password === 'admin') {
+          if (username === 'admin@cku.ac.kr' && password === 'admin123!') {
             set({
               user: {
                 id: 1,
-                username: 'admin',
+                username: 'admin@cku.ac.kr',
                 name: '관리자',
                 role: 'ADMIN'
               },
