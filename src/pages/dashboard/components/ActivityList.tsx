@@ -8,6 +8,7 @@ import { useDashboardStore } from '../../../store/dashboard';
 type ActivityType = 'ALL' | 'REPAIR' | 'STAYOUT' | 'QNA';
 
 interface ActivityFilterButtonProps {
+  // @ts-ignore - 추후 타입별 스타일링이나 동작 구분을 위해 보존
   type: ActivityType;
   active: boolean;
   onClick: () => void;
@@ -15,6 +16,7 @@ interface ActivityFilterButtonProps {
 }
 
 const ActivityFilterButton: React.FC<ActivityFilterButtonProps> = ({
+  // @ts-ignore - 추후 사용 예정
   type,
   active,
   onClick,

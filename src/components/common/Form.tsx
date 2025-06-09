@@ -1,5 +1,7 @@
-import React, { ChangeEvent } from 'react';
+import React from 'react';
 import { twMerge } from 'tailwind-merge';
+// TODO: Input 컴포넌트 구현 시 필요한 ChangeEvent
+// import { ChangeEvent } from 'react';
 
 interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
