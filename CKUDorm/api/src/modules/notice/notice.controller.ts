@@ -19,12 +19,24 @@ export class NoticeController {
 
   @Get()
   async findAll(
-    @Query('category') category?: NoticeCategory
-  ): Promise<ApiResponse<Notice[]>> {
-    const notices = await this.noticeService.findAll(category);
+    @Query('category') category?: NoticeCategory,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('search') search?: string,
+  ): Promise<ApiResponse<{ notices: Notice[]; total: number }>> {
+    const { notices, total } = await this.noticeService.findAll({
+      category,
+      page,
+      limit,
+      search,
+    });
+
     return {
       success: true,
-      data: notices,
+      data: {
+        notices,
+        total,
+      },
     };
   }
 

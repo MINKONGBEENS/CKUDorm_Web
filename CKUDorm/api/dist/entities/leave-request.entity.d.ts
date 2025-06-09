@@ -14,7 +14,7 @@ export declare class LeaveRequest {
     id: number;
     studentId: number;
     student: Kandorm;
-    apply_date: Date;
+    applyDate: Date;
     duration: LeaveRequestDuration;
     reason: string;
     contact: string;
@@ -23,5 +23,5 @@ export declare class LeaveRequest {
     reviewedBy: number;
     reviewer: Admin;
     reviewedAt: Date;
-    created_at: Date;
+    createdAt: Date;
 }

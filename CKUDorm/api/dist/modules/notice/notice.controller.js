@@ -21,11 +21,19 @@ let NoticeController = class NoticeController {
     constructor(noticeService) {
         this.noticeService = noticeService;
     }
-    async findAll(category) {
-        const notices = await this.noticeService.findAll(category);
+    async findAll(category, page = 1, limit = 10, search) {
+        const { notices, total } = await this.noticeService.findAll({
+            category,
+            page,
+            limit,
+            search,
+        });
         return {
             success: true,
-            data: notices,
+            data: {
+                notices,
+                total,
+            },
         };
     }
     async findOne(id) {
@@ -63,8 +71,11 @@ exports.NoticeController = NoticeController;
 __decorate([
     (0, common_1.Get)(),
     __param(0, (0, common_1.Query)('category')),
+    __param(1, (0, common_1.Query)('page')),
+    __param(2, (0, common_1.Query)('limit')),
+    __param(3, (0, common_1.Query)('search')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, Number, Number, String]),
     __metadata("design:returntype", Promise)
 ], NoticeController.prototype, "findAll", null);
 __decorate([

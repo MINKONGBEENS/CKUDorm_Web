@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { User } from './user.entity';
 
 export enum NoticeCategory {
   GENERAL = 'GENERAL',
@@ -19,6 +20,13 @@ export class Notice {
 
   @Column({ type: 'enum', enum: NoticeCategory, default: NoticeCategory.GENERAL })
   category: NoticeCategory;
+
+  @ManyToOne(() => User, { nullable: true })
+  @JoinColumn({ name: 'author_id' })
+  author?: User;
+
+  @Column({ name: 'author_id', nullable: true })
+  authorId?: number;
 
   @CreateDateColumn({ type: 'datetime', precision: 6 })
   createdAt: Date;

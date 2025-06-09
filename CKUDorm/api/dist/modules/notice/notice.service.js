@@ -22,17 +22,35 @@ let NoticeService = class NoticeService {
     constructor(noticeRepository) {
         this.noticeRepository = noticeRepository;
     }
-    async findAll(category) {
-        const where = category ? { category } : {};
-        return this.noticeRepository.find({
-            where,
+    async findAll(options) {
+        const { category, page = 1, limit = 10, search } = options;
+        const skip = (page - 1) * limit;
+        const whereClause = {};
+        if (category) {
+            whereClause.category = category;
+        }
+        if (search) {
+            whereClause.title = (0, typeorm_2.Like)(`%${search}%`);
+        }
+        const [notices, total] = await this.noticeRepository.findAndCount({
+            where: whereClause,
             order: {
                 createdAt: 'DESC',
             },
+            skip,
+            take: limit,
+            relations: ['author'],
         });
+        return {
+            notices,
+            total,
+        };
     }
     async findOne(id) {
-        const notice = await this.noticeRepository.findOne({ where: { id } });
+        const notice = await this.noticeRepository.findOne({
+            where: { id },
+            relations: ['author'],
+        });
         if (!notice) {
             throw new common_1.NotFoundException('Notice not found');
         }
@@ -45,11 +63,7 @@ let NoticeService = class NoticeService {
     async update(id, notice) {
         await this.findOne(id);
         await this.noticeRepository.update(id, notice);
-        const updatedNotice = await this.noticeRepository.findOne({ where: { id } });
-        if (!updatedNotice) {
-            throw new common_1.NotFoundException('Notice not found after update');
-        }
-        return updatedNotice;
+        return this.findOne(id);
     }
     async delete(id) {
         const notice = await this.findOne(id);

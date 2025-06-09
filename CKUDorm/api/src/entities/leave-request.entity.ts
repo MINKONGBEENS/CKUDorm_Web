@@ -14,7 +14,7 @@ export enum LeaveRequestStatus {
   REJECTED = 'rejected'
 }
 
-@Entity('leave_requests')
+@Entity('leave_request')
 export class LeaveRequest {
   @PrimaryGeneratedColumn()
   id: number;
@@ -27,7 +27,7 @@ export class LeaveRequest {
   student: Kandorm;
 
   @Column({ type: 'date' })
-  apply_date: Date;
+  applyDate: Date;
 
   @Column({ type: 'enum', enum: LeaveRequestDuration })
   duration: LeaveRequestDuration;
@@ -54,6 +54,6 @@ export class LeaveRequest {
   @Column({ name: 'reviewed_at', type: 'datetime', nullable: true })
   reviewedAt: Date;
 
-  @CreateDateColumn()
-  created_at: Date;
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
 } 

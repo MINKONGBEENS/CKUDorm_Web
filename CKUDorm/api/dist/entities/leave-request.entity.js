@@ -29,7 +29,7 @@ let LeaveRequest = class LeaveRequest {
     id;
     studentId;
     student;
-    apply_date;
+    applyDate;
     duration;
     reason;
     contact;
@@ -38,7 +38,7 @@ let LeaveRequest = class LeaveRequest {
     reviewedBy;
     reviewer;
     reviewedAt;
-    created_at;
+    createdAt;
 };
 exports.LeaveRequest = LeaveRequest;
 __decorate([
@@ -57,7 +57,7 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)({ type: 'date' }),
     __metadata("design:type", Date)
-], LeaveRequest.prototype, "apply_date", void 0);
+], LeaveRequest.prototype, "applyDate", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: 'enum', enum: LeaveRequestDuration }),
     __metadata("design:type", String)
@@ -92,10 +92,10 @@ __decorate([
     __metadata("design:type", Date)
 ], LeaveRequest.prototype, "reviewedAt", void 0);
 __decorate([
-    (0, typeorm_1.CreateDateColumn)(),
+    (0, typeorm_1.CreateDateColumn)({ name: 'created_at' }),
     __metadata("design:type", Date)
-], LeaveRequest.prototype, "created_at", void 0);
+], LeaveRequest.prototype, "createdAt", void 0);
 exports.LeaveRequest = LeaveRequest = __decorate([
-    (0, typeorm_1.Entity)('leave_requests')
+    (0, typeorm_1.Entity)('leave_request')
 ], LeaveRequest);
 //# sourceMappingURL=leave-request.entity.js.map

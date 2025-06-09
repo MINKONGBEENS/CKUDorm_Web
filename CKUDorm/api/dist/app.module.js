@@ -22,6 +22,7 @@ const menu_entity_1 = require("./entities/menu.entity");
 const notice_entity_1 = require("./entities/notice.entity");
 const point_entity_1 = require("./entities/point.entity");
 const qna_entity_1 = require("./entities/qna.entity");
+const user_entity_1 = require("./entities/user.entity");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -31,15 +32,31 @@ exports.AppModule = AppModule = __decorate([
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
             }),
-            typeorm_1.TypeOrmModule.forRoot({
-                type: 'mysql',
-                host: process.env.DB_HOST,
-                port: parseInt(process.env.DB_PORT),
-                username: process.env.DB_USERNAME,
-                password: process.env.DB_PASSWORD,
-                database: process.env.DB_DATABASE,
-                entities: [admin_entity_1.Admin, department_entity_1.Department, kandorm_entity_1.Kandorm, leave_request_entity_1.LeaveRequest, menu_entity_1.Menu, notice_entity_1.Notice, point_entity_1.Point, qna_entity_1.Qna],
-                synchronize: false,
+            typeorm_1.TypeOrmModule.forRootAsync({
+                imports: [config_1.ConfigModule],
+                useFactory: (configService) => ({
+                    type: 'mysql',
+                    host: configService.get('DB_HOST'),
+                    port: +configService.get('DB_PORT'),
+                    username: configService.get('DB_USERNAME'),
+                    password: configService.get('DB_PASSWORD'),
+                    database: configService.get('DB_DATABASE'),
+                    entities: [
+                        department_entity_1.Department,
+                        admin_entity_1.Admin,
+                        user_entity_1.User,
+                        kandorm_entity_1.Kandorm,
+                        leave_request_entity_1.LeaveRequest,
+                        menu_entity_1.Menu,
+                        notice_entity_1.Notice,
+                        point_entity_1.Point,
+                        qna_entity_1.Qna,
+                    ],
+                    synchronize: false,
+                    logging: true,
+                    charset: 'utf8mb4',
+                }),
+                inject: [config_1.ConfigService],
             }),
             auth_module_1.AuthModule,
             notice_module_1.NoticeModule,

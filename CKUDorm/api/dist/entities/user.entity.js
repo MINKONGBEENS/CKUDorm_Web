@@ -9,60 +9,52 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Notice = exports.NoticeCategory = void 0;
+exports.User = exports.UserRole = void 0;
 const typeorm_1 = require("typeorm");
-const user_entity_1 = require("./user.entity");
-var NoticeCategory;
-(function (NoticeCategory) {
-    NoticeCategory["GENERAL"] = "GENERAL";
-    NoticeCategory["IMPORTANT"] = "IMPORTANT";
-    NoticeCategory["EVENT"] = "EVENT";
-})(NoticeCategory || (exports.NoticeCategory = NoticeCategory = {}));
-let Notice = class Notice {
+var UserRole;
+(function (UserRole) {
+    UserRole["ADMIN"] = "ADMIN";
+    UserRole["STUDENT"] = "STUDENT";
+})(UserRole || (exports.UserRole = UserRole = {}));
+let User = class User {
     id;
-    title;
-    content;
-    category;
-    author;
-    authorId;
+    name;
+    email;
+    password;
+    role;
     createdAt;
     updatedAt;
 };
-exports.Notice = Notice;
+exports.User = User;
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
-], Notice.prototype, "id", void 0);
+], User.prototype, "id", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: 'varchar', length: 255 }),
     __metadata("design:type", String)
-], Notice.prototype, "title", void 0);
+], User.prototype, "name", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'text' }),
+    (0, typeorm_1.Column)({ type: 'varchar', length: 255, unique: true }),
     __metadata("design:type", String)
-], Notice.prototype, "content", void 0);
+], User.prototype, "email", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'enum', enum: NoticeCategory, default: NoticeCategory.GENERAL }),
+    (0, typeorm_1.Column)({ type: 'varchar', length: 255, select: false }),
     __metadata("design:type", String)
-], Notice.prototype, "category", void 0);
+], User.prototype, "password", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => user_entity_1.User, { nullable: true }),
-    (0, typeorm_1.JoinColumn)({ name: 'author_id' }),
-    __metadata("design:type", user_entity_1.User)
-], Notice.prototype, "author", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ name: 'author_id', nullable: true }),
-    __metadata("design:type", Number)
-], Notice.prototype, "authorId", void 0);
+    (0, typeorm_1.Column)({ type: 'enum', enum: UserRole, default: UserRole.STUDENT }),
+    __metadata("design:type", String)
+], User.prototype, "role", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)({ type: 'datetime', precision: 6 }),
     __metadata("design:type", Date)
-], Notice.prototype, "createdAt", void 0);
+], User.prototype, "createdAt", void 0);
 __decorate([
     (0, typeorm_1.UpdateDateColumn)({ type: 'datetime', precision: 6 }),
     __metadata("design:type", Date)
-], Notice.prototype, "updatedAt", void 0);
-exports.Notice = Notice = __decorate([
-    (0, typeorm_1.Entity)('notices')
-], Notice);
-//# sourceMappingURL=notice.entity.js.map
+], User.prototype, "updatedAt", void 0);
+exports.User = User = __decorate([
+    (0, typeorm_1.Entity)('users')
+], User);
+//# sourceMappingURL=user.entity.js.map

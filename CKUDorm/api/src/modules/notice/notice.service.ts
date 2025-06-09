@@ -1,7 +1,19 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Like } from 'typeorm';
 import { Notice, NoticeCategory } from '../../entities/notice.entity';
+
+interface FindAllOptions {
+  category?: NoticeCategory;
+  page?: number;
+  limit?: number;
+  search?: string;
+}
+
+interface PaginatedNotices {
+  notices: Notice[];
+  total: number;
+}
 
 @Injectable()
 export class NoticeService {
@@ -10,18 +22,39 @@ export class NoticeService {
     private noticeRepository: Repository<Notice>,
   ) {}
 
-  async findAll(category?: NoticeCategory): Promise<Notice[]> {
-    const where = category ? { category } : {};
-    return this.noticeRepository.find({
-      where,
+  async findAll(options: FindAllOptions): Promise<PaginatedNotices> {
+    const { category, page = 1, limit = 10, search } = options;
+    const skip = (page - 1) * limit;
+
+    const whereClause: any = {};
+    if (category) {
+      whereClause.category = category;
+    }
+    if (search) {
+      whereClause.title = Like(`%${search}%`);
+    }
+
+    const [notices, total] = await this.noticeRepository.findAndCount({
+      where: whereClause,
       order: {
         createdAt: 'DESC',
       },
+      skip,
+      take: limit,
+      relations: ['author'],
     });
+
+    return {
+      notices,
+      total,
+    };
   }
 
   async findOne(id: number): Promise<Notice> {
-    const notice = await this.noticeRepository.findOne({ where: { id } });
+    const notice = await this.noticeRepository.findOne({
+      where: { id },
+      relations: ['author'],
+    });
     if (!notice) {
       throw new NotFoundException('Notice not found');
     }
@@ -36,11 +69,7 @@ export class NoticeService {
   async update(id: number, notice: Partial<Notice>): Promise<Notice> {
     await this.findOne(id); // 존재 여부 확인
     await this.noticeRepository.update(id, notice);
-    const updatedNotice = await this.noticeRepository.findOne({ where: { id } });
-    if (!updatedNotice) {
-      throw new NotFoundException('Notice not found after update');
-    }
-    return updatedNotice;
+    return this.findOne(id);
   }
 
   async delete(id: number): Promise<void> {
