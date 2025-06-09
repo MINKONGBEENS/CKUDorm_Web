@@ -11,6 +11,86 @@ interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
   className?: string;
 }
 
+interface ValidationRules {
+  username: {
+    pattern: /^[a-zA-Z0-9]{4,20}$/,
+    message: '4~20자의 영문/숫자만 사용 가능합니다'
+  },
+  password: {
+    pattern: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,20}$/,
+    message: '8~20자의 영문/숫자/특수문자를 포함해야 합니다'
+  }
+}
+
+interface Session {
+  token: string;
+  expiresIn: number;
+  user: {
+    id: number;
+    username: string;
+    role: string;
+  }
+}
+
+interface InputProps {
+  /** 입력 필드 레이블 */
+  label: string;
+  /** 에러 메시지 */
+  error?: string;
+  /** 도움말 텍스트 */
+  helperText?: string;
+  /** 추가 스타일 클래스 */
+  className?: string;
+  /** 입력 필드 타입 */
+  type: 'text' | 'password' | 'email' | 'number';
+  /** 필드 이름 */
+  name: string;
+  /** 필드 값 */
+  value: string;
+  /** 값 변경 핸들러 */
+  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  /** 필수 입력 여부 */
+  required?: boolean;
+  /** 비활성화 상태 */
+  disabled?: boolean;
+  /** 플레이스홀더 */
+  placeholder?: string;
+}
+
+interface InputStyles {
+  container: string;
+  label: string;
+  input: {
+    base: string;
+    error: string;
+    disabled: string;
+  };
+  helper: string;
+  error: string;
+}
+
+const inputStyles: InputStyles = {
+  container: 'flex flex-col gap-1',
+  label: 'text-sm font-medium text-gray-700',
+  input: {
+    base: `
+      w-full
+      px-3
+      py-2
+      border
+      rounded-lg
+      focus:ring-2
+      focus:ring-[#006272]
+      outline-none
+      transition-all
+    `,
+    error: 'border-red-500 focus:ring-red-500',
+    disabled: 'bg-gray-100 cursor-not-allowed'
+  },
+  helper: 'text-xs text-gray-500',
+  error: 'text-xs text-red-500'
+};
+
 export const Form: React.FC<FormProps> = ({
   onSubmit,
   title,
