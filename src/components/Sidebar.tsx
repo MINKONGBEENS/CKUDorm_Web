@@ -53,7 +53,6 @@ const Sidebar: React.FC = () => {
           src="/assets/logo/logo.svg" 
           alt="CKUDorm Logo" 
           className="w-24 h-24 mb-4" 
-          style={{ filter: 'invert(24%) sepia(99%) saturate(747%) hue-rotate(153deg) brightness(97%) contrast(101%)' }} 
         />
         <h1 
           className="text-4xl font-bold mb-2 text-[#006272]" 
