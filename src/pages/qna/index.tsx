@@ -1,60 +1,64 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useQnaStore } from '../../store/qna';
+import { Button } from '../../components/common/Button';
+import type { Question } from '../../types';
 
-type Question = {
-  id: number;
-  title: string;
-  category: string;
-  content: string;
-  date: string;
-  answer: string;
-};
+const QnA: React.FC = () => {
+  const questions = useQnaStore((state) => state.questions);
 
-interface QnAProps {
-  questions: Question[];
-}
-
-const QnA: React.FC<QnAProps> = ({ questions }) => {
   return (
-    <div className="p-8">
-      <div className="flex justify-between items-center mb-8">
-        <div className="flex items-center">
-          <button
-            onClick={() => window.history.back()}
-            className="mr-4 p-2 hover:bg-gray-100 rounded-full"
-          >
-            <i className="fas fa-arrow-left text-gray-600"></i>
-          </button>
-          <h1 className="text-2xl font-bold">Q&A 관리</h1>
-        </div>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-gray-900">문의사항</h1>
+        <Button
+          as={Link}
+          to="/qna/new"
+          variant="primary"
+        >
+          새 문의 작성
+        </Button>
       </div>
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100">
-        <div className="p-6 border-b border-gray-100">
-          <h2 className="text-lg font-bold">문의사항 목록</h2>
-        </div>
-        <div className="divide-y divide-gray-100">
-          {questions.map((question) => (
-            <Link to={`/qna/${question.id}`} key={question.id} className="block hover:bg-gray-50 transition">
-              <div className="p-6 cursor-pointer">
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <span className="inline-block px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 mr-2">
-                      {question.category}
-                    </span>
-                    <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${
-                      question.answer ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                    }`}>
-                      {question.answer ? '답변 완료' : '답변 미작성'}
-                    </span>
+
+      <div className="bg-white shadow overflow-hidden sm:rounded-md">
+        <ul className="divide-y divide-gray-200">
+          {questions.map((question: Question) => (
+            <li key={question.id}>
+              <Link
+                to={`/qna/${question.id}`}
+                className="block hover:bg-gray-50"
+              >
+                <div className="px-4 py-4 sm:px-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <p className="text-sm font-medium text-[#006272] truncate">
+                        {question.title}
+                      </p>
+                      <span className="ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                        {question.category}
+                      </span>
+                    </div>
+                    <div className="ml-2 flex-shrink-0 flex">
+                      <p className="text-sm text-gray-500">
+                        {new Date(question.date).toLocaleDateString()}
+                      </p>
+                    </div>
                   </div>
-                  <span className="text-sm text-gray-500">{question.date}</span>
+                  <div className="mt-2">
+                    <p className="text-sm text-gray-600 line-clamp-2">
+                      {question.content}
+                    </p>
+                  </div>
+                  {question.answer && (
+                    <div className="mt-2 flex items-center text-sm text-gray-500">
+                      <span className="truncate">답변완료</span>
+                    </div>
+                  )}
                 </div>
-                <h3 className="text-lg font-medium mb-2">{question.title}</h3>
-                <p className="text-gray-600 mb-4 line-clamp-2">{question.content}</p>
-              </div>
-            </Link>
+              </Link>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </div>
   );

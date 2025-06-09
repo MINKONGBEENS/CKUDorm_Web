@@ -1,9 +1,15 @@
 // The exported code uses Tailwind CSS. Install Tailwind CSS in your dev environment to ensure all styles work.
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useDashboardStore } from '../../store/dashboard';
+import { NotificationPanel } from './components/NotificationPanel';
+import { StatsCard } from './components/StatsCard';
+import { ActivityList } from './components/ActivityList';
+import { NoticeList } from './components/NoticeList';
 
-const Dashboard: React.FC = () => {
+export const Dashboard: React.FC = () => {
   const [showNotifications, setShowNotifications] = useState(false);
+  const { stats } = useDashboardStore();
 
   // 알림 데이터
   const notifications = [
@@ -29,13 +35,6 @@ const Dashboard: React.FC = () => {
       isNew: false,
     },
   ];
-
-  // 통계 데이터
-  const stats = {
-    totalStudents: 320,
-    pendingStayouts: 5,
-    pendingRepairs: 3,
-  };
 
   // 최근 공지사항 데이터
   const recentNotices = [
@@ -83,49 +82,8 @@ const Dashboard: React.FC = () => {
               onClick={() => setShowNotifications(!showNotifications)}
             >
               <i className="fas fa-bell text-xl"></i>
-              {/* 알림 모달 */}
               {showNotifications && (
-                <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
-                  <div className="p-4 border-b border-gray-100">
-                    <h3 className="font-medium">알림</h3>
-                  </div>
-                  <div className="max-h-80 overflow-y-auto">
-                    {notifications.length > 0 ? (
-                      notifications.map((notification) => (
-                        <div
-                          key={notification.id}
-                          className={`p-4 border-b border-gray-100 ${notification.isNew ? "bg-blue-50" : ""}`}
-                        >
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <h4 className="font-medium text-sm">
-                                {notification.title}
-                              </h4>
-                              <p className="text-gray-600 text-sm mt-1">
-                                {notification.message}
-                              </p>
-                            </div>
-                            <span className="text-xs text-gray-500">
-                              {notification.time}
-                            </span>
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="p-4 text-center text-gray-500">
-                        새로운 알림이 없습니다
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-3 text-center border-t border-gray-100">
-                    <a
-                      href="#"
-                      className="text-[#006272] text-sm font-medium"
-                    >
-                      모든 알림 보기
-                    </a>
-                  </div>
-                </div>
+                <NotificationPanel onClose={() => setShowNotifications(false)} />
               )}
             </button>
           </div>
@@ -140,144 +98,30 @@ const Dashboard: React.FC = () => {
 
       {/* 통계 카드 */}
       <div className="grid grid-cols-3 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex justify-between items-center">
-          <div>
-            <div className="text-sm text-gray-500 mb-1">전체 학생 수</div>
-            <div className="text-2xl font-bold">
-              {stats.totalStudents}명
-            </div>
-          </div>
-          <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center">
-            <i className="fas fa-users text-[#006272] text-xl"></i>
-          </div>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex justify-between items-center">
-          <div>
-            <div className="text-sm text-gray-500 mb-1">
-              미해결 외박 승인 요청
-            </div>
-            <div className="text-2xl font-bold">
-              {stats.pendingStayouts}건
-            </div>
-          </div>
-          <div className="w-12 h-12 rounded-full bg-yellow-50 flex items-center justify-center">
-            <i className="fas fa-moon text-[#006272] text-xl"></i>
-          </div>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex justify-between items-center">
-          <div>
-            <div className="text-sm text-gray-500 mb-1">
-              미해결 고장수리 요청
-            </div>
-            <div className="text-2xl font-bold">
-              {stats.pendingRepairs}건
-            </div>
-          </div>
-          <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center">
-            <i className="fas fa-wrench text-[#006272] text-xl"></i>
-          </div>
-        </div>
+        <StatsCard
+          title="전체 학생 수"
+          value={`${stats.totalStudents}명`}
+          icon="users"
+          iconBgColor="bg-blue-50"
+        />
+        <StatsCard
+          title="미해결 외박 승인 요청"
+          value={`${stats.pendingStayouts}건`}
+          icon="moon"
+          iconBgColor="bg-yellow-50"
+        />
+        <StatsCard
+          title="미해결 고장수리 요청"
+          value={`${stats.pendingRepairs}건`}
+          icon="wrench"
+          iconBgColor="bg-red-50"
+        />
       </div>
 
       {/* 최근 활동 섹션 */}
       <div className="grid grid-cols-2 gap-6 mb-8">
-        {/* 최근 활동 */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-100">
-          <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-            <h2 className="text-lg font-bold">최근 활동</h2>
-            <div className="flex space-x-2">
-              <button className="px-3 py-1 text-sm rounded-full bg-[#006272] text-white">
-                전체
-              </button>
-              <button className="px-3 py-1 text-sm rounded-full text-gray-600 hover:bg-gray-100">
-                고장수리
-              </button>
-              <button className="px-3 py-1 text-sm rounded-full text-gray-600 hover:bg-gray-100">
-                외박신청
-              </button>
-              <button className="px-3 py-1 text-sm rounded-full text-gray-600 hover:bg-gray-100">
-                QnA
-              </button>
-            </div>
-          </div>
-          <div className="p-4">
-            <div className="space-y-4">
-              <div className="flex items-start space-x-4 p-4 hover:bg-gray-50 rounded-lg">
-                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                  <i className="fas fa-wrench text-blue-600"></i>
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-medium">
-                      302호 수도꼭지 수리 완료
-                    </h3>
-                    <span className="text-sm text-gray-500">10분 전</span>
-                  </div>
-                  <p className="text-gray-600 mt-1">
-                    수도꼭지 누수 현상 해결 완료
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start space-x-4 p-4 hover:bg-gray-50 rounded-lg">
-                <div className="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center flex-shrink-0">
-                  <i className="fas fa-moon text-yellow-600"></i>
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-medium">김민준 외박 신청 승인</h3>
-                    <span className="text-sm text-gray-500">30분 전</span>
-                  </div>
-                  <p className="text-gray-600 mt-1">
-                    5월 27일 외박 신청 승인 처리
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* 최근 공지사항 */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-100">
-          <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-            <h2 className="text-lg font-bold">최근 공지사항</h2>
-            <Link
-              to="/notice"
-              className="text-[#006272] text-sm font-medium cursor-pointer"
-            >
-              전체 보기
-            </Link>
-          </div>
-          <div className="p-4">
-            <ul className="divide-y divide-gray-100">
-              {recentNotices.map((notice) => (
-                <li
-                  key={notice.id}
-                  className="py-3 hover:bg-gray-50 cursor-pointer"
-                >
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center">
-                      <span
-                        className={`px-2 py-1 rounded text-xs font-medium mr-3 ${
-                          notice.category === "공지"
-                            ? "bg-blue-100 text-blue-800"
-                            : notice.category === "안전"
-                              ? "bg-red-100 text-red-800"
-                              : "bg-green-100 text-green-800"
-                        }`}
-                      >
-                        {notice.category}
-                      </span>
-                      <span className="text-gray-800">{notice.title}</span>
-                    </div>
-                    <span className="text-xs text-gray-500">
-                      {notice.date}
-                    </span>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
+        <ActivityList />
+        <NoticeList />
       </div>
 
       {/* 하단 정보 */}

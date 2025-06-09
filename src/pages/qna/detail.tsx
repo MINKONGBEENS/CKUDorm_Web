@@ -1,76 +1,107 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useQnaStore } from '../../store/qna';
+import { Button } from '../../components/common/Button';
 
-type Question = {
-  id: number;
-  title: string;
-  category: string;
-  content: string;
-  date: string;
-  answer: string;
-};
-
-interface QnADetailProps {
-  questions: Question[];
-  setQuestions: React.Dispatch<React.SetStateAction<Question[]>>;
-}
-
-const QnADetail: React.FC<QnADetailProps> = ({ questions, setQuestions }) => {
+const QnADetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const question = questions.find(q => q.id === Number(id));
-  const [answer, setAnswer] = useState(question?.answer || '');
+  const [isEditing, setIsEditing] = useState(false);
+  const [answer, setAnswer] = useState('');
 
-  if (!question) return <div className="p-8">존재하지 않는 문의입니다.</div>;
+  const { questions, updateQuestion } = useQnaStore();
+  const question = questions.find((q) => q.id === Number(id));
 
-  const handleSubmit = () => {
-    setQuestions(questions.map(q =>
-      q.id === question.id ? { ...q, answer } : q
-    ));
-    navigate('/qna');
+  if (!question) {
+    return (
+      <div className="text-center py-10">
+        <h2 className="text-xl font-semibold text-gray-900">
+          문의사항을 찾을 수 없습니다.
+        </h2>
+        <Button
+          onClick={() => navigate('/qna')}
+          className="mt-4"
+        >
+          목록으로 돌아가기
+        </Button>
+      </div>
+    );
+  }
+
+  const handleSubmitAnswer = () => {
+    updateQuestion(Number(id), { answer });
+    setIsEditing(false);
   };
 
   return (
-    <div className="p-8 max-w-2xl mx-auto">
-      <div className="flex items-center mb-8">
-        <button
-          onClick={() => navigate(-1)}
-          className="mr-4 p-2 hover:bg-gray-100 rounded-full"
-        >
-          <i className="fas fa-arrow-left text-gray-600"></i>
-        </button>
-        <h1 className="text-2xl font-bold">Q&A 상세</h1>
+    <div className="max-w-3xl mx-auto">
+      <div className="bg-white shadow sm:rounded-lg">
+        <div className="px-4 py-5 sm:px-6">
+          <div className="flex justify-between items-center">
+            <h2 className="text-lg font-medium text-gray-900">
+              {question.title}
+            </h2>
+            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+              {question.category}
+            </span>
+          </div>
+          <p className="mt-1 text-sm text-gray-500">
+            작성일: {new Date(question.date).toLocaleDateString()}
+          </p>
+        </div>
+        <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
+          <div className="text-sm text-gray-900">
+            {question.content}
+          </div>
+          {question.answer && !isEditing ? (
+            <div className="mt-6 bg-gray-50 p-4 rounded-md">
+              <h3 className="text-sm font-medium text-gray-900">답변</h3>
+              <div className="mt-2 text-sm text-gray-700">
+                {question.answer}
+              </div>
+            </div>
+          ) : isEditing ? (
+            <div className="mt-6">
+              <textarea
+                rows={4}
+                className="shadow-sm block w-full focus:ring-[#006272] focus:border-[#006272] sm:text-sm border border-gray-300 rounded-md"
+                value={answer}
+                onChange={(e) => setAnswer(e.target.value)}
+                placeholder="답변을 입력하세요..."
+              />
+              <div className="mt-4 flex justify-end space-x-3">
+                <Button
+                  variant="secondary"
+                  onClick={() => setIsEditing(false)}
+                >
+                  취소
+                </Button>
+                <Button
+                  onClick={handleSubmitAnswer}
+                  disabled={!answer.trim()}
+                >
+                  답변 등록
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="mt-6">
+              <Button
+                onClick={() => setIsEditing(true)}
+              >
+                답변 작성
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-6">
-        <div className="flex justify-between items-center mb-2">
-          <span className="inline-block px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 mr-2">
-            {question.category}
-          </span>
-          <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${
-            question.answer ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-          }`}>
-            {question.answer ? '답변 완료' : '답변 미작성'}
-          </span>
-          <span className="text-sm text-gray-500 ml-auto">{question.date}</span>
-        </div>
-        <h2 className="text-lg font-semibold mb-2">{question.title}</h2>
-        <p className="text-gray-700 mb-4">{question.content}</p>
-        <div className="mt-6">
-          <label className="block text-gray-700 text-sm font-medium mb-2">답변</label>
-          <textarea
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#006272] h-32"
-            placeholder="답변을 입력하세요"
-            value={answer}
-            onChange={e => setAnswer(e.target.value)}
-          />
-          <button
-            onClick={handleSubmit}
-            className="mt-4 px-4 py-2 bg-[#006272] text-white rounded-md hover:bg-[#004d5a] transition-colors"
-            disabled={answer.trim() === ''}
-          >
-            답변 등록
-          </button>
-        </div>
+      <div className="mt-6">
+        <Button
+          variant="secondary"
+          onClick={() => navigate('/qna')}
+        >
+          목록으로
+        </Button>
       </div>
     </div>
   );
