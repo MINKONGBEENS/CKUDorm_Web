@@ -4,8 +4,12 @@ const core_1 = require("@nestjs/core");
 const common_1 = require("@nestjs/common");
 const app_module_1 = require("./app.module");
 const swagger_1 = require("@nestjs/swagger");
+const common_2 = require("@nestjs/common");
 async function bootstrap() {
-    const app = await core_1.NestFactory.create(app_module_1.AppModule);
+    const logger = new common_2.Logger('Bootstrap');
+    const app = await core_1.NestFactory.create(app_module_1.AppModule, {
+        logger: ['error', 'warn', 'debug'],
+    });
     app.enableCors({
         origin: [
             'http://localhost:3000',
@@ -31,8 +35,8 @@ async function bootstrap() {
     }));
     const port = process.env.PORT || 4000;
     await app.listen(port);
-    console.log(`API Server is running on port ${port}`);
-    console.log(`Swagger documentation available at http://localhost:${port}/api-docs`);
+    logger.log(`API Server is running on port ${port}`);
+    logger.log(`Swagger documentation available at http://localhost:${port}/api-docs`);
 }
 bootstrap();
 //# sourceMappingURL=main.js.map

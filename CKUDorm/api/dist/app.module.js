@@ -14,6 +14,7 @@ const auth_module_1 = require("./modules/auth/auth.module");
 const notice_module_1 = require("./modules/notice/notice.module");
 const point_module_1 = require("./modules/point/point.module");
 const kandorm_module_1 = require("./modules/kandorm/kandorm.module");
+const leave_request_module_1 = require("./modules/leave-request/leave-request.module");
 const admin_entity_1 = require("./entities/admin.entity");
 const department_entity_1 = require("./entities/department.entity");
 const kandorm_entity_1 = require("./entities/kandorm.entity");
@@ -53,7 +54,7 @@ exports.AppModule = AppModule = __decorate([
                         qna_entity_1.Qna,
                     ],
                     synchronize: false,
-                    logging: true,
+                    logging: ['error'],
                     charset: 'utf8mb4',
                 }),
                 inject: [config_1.ConfigService],
@@ -62,6 +63,7 @@ exports.AppModule = AppModule = __decorate([
             notice_module_1.NoticeModule,
             point_module_1.PointModule,
             kandorm_module_1.KandormModule,
+            leave_request_module_1.LeaveRequestModule,
         ],
     })
 ], AppModule);

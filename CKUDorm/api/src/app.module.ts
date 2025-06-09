@@ -5,6 +5,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { NoticeModule } from './modules/notice/notice.module';
 import { PointModule } from './modules/point/point.module';
 import { KandormModule } from './modules/kandorm/kandorm.module';
+import { LeaveRequestModule } from './modules/leave-request/leave-request.module';
 import { Admin } from './entities/admin.entity';
 import { Department } from './entities/department.entity';
 import { Kandorm } from './entities/kandorm.entity';
@@ -41,7 +42,7 @@ import { User } from './entities/user.entity';
           Qna,
         ],
         synchronize: false,
-        logging: true,
+        logging: ['error'],
         charset: 'utf8mb4',
       }),
       inject: [ConfigService],
@@ -50,6 +51,7 @@ import { User } from './entities/user.entity';
     NoticeModule,
     PointModule,
     KandormModule,
+    LeaveRequestModule,
   ],
 })
 export class AppModule {}

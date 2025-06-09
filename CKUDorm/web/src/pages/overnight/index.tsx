@@ -1,56 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getLeaveRequests, updateLeaveRequestStatus, LeaveRequest } from '../../api/leave-request';
+import { toast } from 'react-hot-toast';
 
 const OvernightManagement: React.FC = () => {
   const navigate = useNavigate();
   const [filter, setFilter] = useState('all');
-  
-  const [applications, setApplications] = useState([
-    {
-      id: 1,
-      student_name: '김민준',
-      student_id: '20230521',
-      room: '6206',
-      start_date: '2024-03-20',
-      end_date: '2024-03-22',
-      reason: '가족 행사 참여',
-      emergency_contact: '010-1234-5678',
-      destination: '서울 강남구',
-      status: '승인대기',
-      created_at: '2024-03-15',
-    },
-    {
-      id: 2,
-      student_name: '박서연',
-      student_id: '20212816',
-      room: '3107',
-      start_date: '2024-03-18',
-      end_date: '2024-03-19',
-      reason: '친구 결혼식 참석',
-      emergency_contact: '010-2345-6789',
-      destination: '부산 해운대구',
-      status: '승인완료',
-      created_at: '2024-03-12',
-    },
-    {
-      id: 3,
-      student_name: '이지원',
-      student_id: '20232418',
-      room: '2208',
-      start_date: '2024-03-25',
-      end_date: '2024-03-27',
-      reason: '가족 여행',
-      emergency_contact: '010-3456-7890',
-      destination: '제주도',
-      status: '반려',
-      created_at: '2024-03-14',
-    },
-  ]);
+  const [applications, setApplications] = useState<LeaveRequest[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleStatusChange = (id: number, newStatus: string) => {
-    setApplications(applications.map(app => 
-      app.id === id ? { ...app, status: newStatus } : app
-    ));
+  useEffect(() => {
+    fetchLeaveRequests();
+  }, []);
+
+  const fetchLeaveRequests = async () => {
+    try {
+      setLoading(true);
+      const response = await getLeaveRequests();
+      if (response.success && Array.isArray(response.data)) {
+        setApplications(response.data);
+      } else {
+        toast.error('외박신청 목록을 불러오는데 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('외박신청 목록을 불러오는데 실패했습니다:', error);
+      toast.error('외박신청 목록을 불러오는데 실패했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStatusChange = async (id: number, newStatus: '승인완료' | '반려') => {
+    try {
+      const response = await updateLeaveRequestStatus(id, newStatus);
+      if (response.success) {
+        await fetchLeaveRequests(); // 목록 새로고침
+        toast.success(response.message || `신청이 ${newStatus === '승인완료' ? '승인' : '반려'}되었습니다.`);
+      } else {
+        toast.error('상태 변경에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('상태 변경에 실패했습니다:', error);
+      toast.error('상태 변경에 실패했습니다.');
+    }
   };
 
   const filteredApplications = applications.filter(app => {
@@ -116,63 +108,69 @@ const OvernightManagement: React.FC = () => {
         <div className="p-6 border-b border-gray-100">
           <h2 className="text-lg font-bold">외박신청 목록</h2>
         </div>
-        <div className="divide-y divide-gray-100">
-          {filteredApplications.map((app) => (
-            <div key={app.id} className="p-6">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(app.status)}`}>
-                    {app.status}
-                  </span>
+        {loading ? (
+          <div className="p-6 text-center text-gray-500">로딩 중...</div>
+        ) : filteredApplications.length === 0 ? (
+          <div className="p-6 text-center text-gray-500">외박신청 내역이 없습니다.</div>
+        ) : (
+          <div className="divide-y divide-gray-100">
+            {filteredApplications.map((app) => (
+              <div key={app.id} className="p-6">
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(app.status)}`}>
+                      {app.status}
+                    </span>
+                  </div>
+                  <span className="text-sm text-gray-500">신청일: {new Date(app.createdAt).toLocaleDateString()}</span>
                 </div>
-                <span className="text-sm text-gray-500">신청일: {app.created_at}</span>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-6 mb-4">
-                <div>
-                  <h3 className="font-medium text-lg mb-2">{app.student_name} ({app.student_id})</h3>
-                  <p className="text-gray-600">호실: {app.room}</p>
+                
+                <div className="grid grid-cols-2 gap-6 mb-4">
+                  <div>
+                    <h3 className="font-medium text-lg mb-2">{app.studentName} ({app.studentId})</h3>
+                    <p className="text-gray-600">호실: {app.room}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">외박 기간</p>
+                    <p className="font-medium">{new Date(app.startDate).toLocaleDateString()} ~ {new Date(app.endDate).toLocaleDateString()}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500">외박 기간</p>
-                  <p className="font-medium">{app.start_date} ~ {app.end_date}</p>
-                </div>
-              </div>
 
-              <div className="grid grid-cols-3 gap-4 mb-4">
-                <div>
-                  <p className="text-sm text-gray-500">외박 사유</p>
-                  <p className="font-medium">{app.reason}</p>
+                <div className="grid grid-cols-3 gap-4 mb-4">
+                  <div>
+                    <p className="text-sm text-gray-500">외박 사유</p>
+                    <p className="font-medium">{app.reason}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">목적지</p>
+                    <p className="font-medium">{app.destination}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">비상연락처</p>
+                    <p className="font-medium">{app.emergencyContact}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500">목적지</p>
-                  <p className="font-medium">{app.destination}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">비상연락처</p>
-                  <p className="font-medium">{app.emergency_contact}</p>
-                </div>
-              </div>
 
-              {app.status === '승인대기' && (
-                <div className="flex space-x-2">
-                  <button
-                    onClick={() => handleStatusChange(app.id, '승인완료')}
-                    className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
-                  >
-                    승인
-                  </button>
-                  <button
-                    onClick={() => handleStatusChange(app.id, '반려')}
-                    className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
-                  >
-                    반려
-                  </button>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+                {app.status === '승인대기' && (
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => handleStatusChange(app.id, '승인완료')}
+                      className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
+                    >
+                      승인
+                    </button>
+                    <button
+                      onClick={() => handleStatusChange(app.id, '반려')}
+                      className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                    >
+                      반려
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

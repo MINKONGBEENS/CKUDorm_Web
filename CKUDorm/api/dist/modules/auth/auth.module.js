@@ -15,20 +15,22 @@ const config_1 = require("@nestjs/config");
 const kandorm_entity_1 = require("../../entities/kandorm.entity");
 const auth_service_1 = require("./auth.service");
 const auth_controller_1 = require("./auth.controller");
-const jwt_strategy_1 = require("./jwt.strategy");
+const jwt_strategy_1 = require("./strategies/jwt.strategy");
+const admin_entity_1 = require("../../entities/admin.entity");
+const user_entity_1 = require("../../entities/user.entity");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
 exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            typeorm_1.TypeOrmModule.forFeature([kandorm_entity_1.Kandorm]),
+            typeorm_1.TypeOrmModule.forFeature([kandorm_entity_1.Kandorm, admin_entity_1.Admin, user_entity_1.User]),
             passport_1.PassportModule,
             jwt_1.JwtModule.registerAsync({
                 imports: [config_1.ConfigModule],
                 useFactory: async (configService) => ({
                     secret: configService.get('JWT_SECRET'),
-                    signOptions: { expiresIn: configService.get('JWT_EXPIRES_IN', '1d') },
+                    signOptions: { expiresIn: configService.get('JWT_EXPIRES_IN') },
                 }),
                 inject: [config_1.ConfigService],
             }),

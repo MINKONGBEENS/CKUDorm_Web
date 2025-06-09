@@ -2,9 +2,13 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { Logger } from '@nestjs/common';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const logger = new Logger('Bootstrap');
+  const app = await NestFactory.create(AppModule, {
+    logger: ['error', 'warn', 'debug'],
+  });
 
   // CORS 설정
   app.enableCors({
@@ -41,7 +45,7 @@ async function bootstrap() {
   // 서버 시작
   const port = process.env.PORT || 4000;
   await app.listen(port);
-  console.log(`API Server is running on port ${port}`);
-  console.log(`Swagger documentation available at http://localhost:${port}/api-docs`);
+  logger.log(`API Server is running on port ${port}`);
+  logger.log(`Swagger documentation available at http://localhost:${port}/api-docs`);
 }
 bootstrap();

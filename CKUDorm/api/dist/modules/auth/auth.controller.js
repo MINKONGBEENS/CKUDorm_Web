@@ -35,8 +35,8 @@ let AuthController = class AuthController {
         const result = await this.authService.login(loginDto);
         return {
             success: true,
-            data: result,
-            message: '로그인이 완료되었습니다.',
+            data: { accessToken: result.data.accessToken },
+            message: result.message,
         };
     }
     async getProfile(req) {
