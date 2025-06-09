@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
@@ -11,7 +11,7 @@ interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
   className?: string;
 }
 
-interface ValidationRules {
+export const validationRules = {
   username: {
     pattern: /^[a-zA-Z0-9]{4,20}$/,
     message: '4~20자의 영문/숫자만 사용 가능합니다'
@@ -20,7 +20,7 @@ interface ValidationRules {
     pattern: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,20}$/,
     message: '8~20자의 영문/숫자/특수문자를 포함해야 합니다'
   }
-}
+} as const;
 
 interface Session {
   token: string;
@@ -29,7 +29,7 @@ interface Session {
     id: number;
     username: string;
     role: string;
-  }
+  };
 }
 
 interface InputProps {
@@ -57,19 +57,7 @@ interface InputProps {
   placeholder?: string;
 }
 
-interface InputStyles {
-  container: string;
-  label: string;
-  input: {
-    base: string;
-    error: string;
-    disabled: string;
-  };
-  helper: string;
-  error: string;
-}
-
-const inputStyles: InputStyles = {
+const inputStyles = {
   container: 'flex flex-col gap-1',
   label: 'text-sm font-medium text-gray-700',
   input: {
@@ -89,7 +77,7 @@ const inputStyles: InputStyles = {
   },
   helper: 'text-xs text-gray-500',
   error: 'text-xs text-red-500'
-};
+} as const;
 
 export const Form: React.FC<FormProps> = ({
   onSubmit,
